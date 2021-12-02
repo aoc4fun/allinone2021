@@ -4,7 +4,7 @@ def count_increase(data, sep=1):
     return sum([data[i+sep] - data[i]>0 for i in range(0, len(data)-sep)])
 
 if __name__ == '__main__':
-    clean_data = [int(i) for i in open("input").readlines()]
+    clean_data = [int(i) for i in open("input.txt").readlines()]
     assert (count_increase(test_data) == 7)
     print(count_increase(clean_data))
     assert (count_increase(test_data,3) == 5)
