@@ -53,15 +53,15 @@ To do this, count _the number of times a depth measurement increases_ from the p
 
 ```
 199 (N/A - no previous measurement)
-200 (<em>increased</em>)
-208 (<em>increased</em>)
-210 (<em>increased</em>)
+200 (increased)
+208 (increased)
+210 (increased)
 200 (decreased)
-207 (<em>increased</em>)
-240 (<em>increased</em>)
-269 (<em>increased</em>)
+207 (increased)
+240 (increased)
+269 (increased)
 260 (decreased)
-263 (<em>increased</em>)
+263 (increased)
 
 ```
 
