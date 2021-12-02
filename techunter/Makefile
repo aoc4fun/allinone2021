@@ -18,7 +18,7 @@ OBJECTS		?= $(patsubst %.go, %.o, $(FILES))
 
 .PHONY: help clean test build all
 
-default: help
+default: all
 
 help:   ## show this help
 	@echo 'usage: make [target] ...'
@@ -26,12 +26,14 @@ help:   ## show this help
 	@echo 'targets:'
 	@egrep '^(.+)\:\ .*##\ (.+)' ${MAKEFILE_LIST} | sed 's/:.*##/#/' | column -t -c 2 -s '#'
 
-all:  env update-dependencies tools prepare clean $(TARGET) test ## clean, format, build and unit test
+all:  clean tools prepare build test ## clean, format, build and unit test
 
 prepare: env $(PREPARE_JOBS)
 
 $(YEAR)/prepare-%:
-	[ -z "$COOKIE" ] && echo missing COOKIE env && exit 1
+ifeq ($(strip $(COOKIE)),)
+	echo missing COOKIE env && exit 1
+endif
 	mkdir -p $(YEAR)/$*
 	[ -f "${YEAR}/$*/README.md" ] || html2md -i "https://adventofcode.com/${YEAR}/day/$*" > ${YEAR}/$*/README.md
 	[ -f "${YEAR}/$*/.input" ] || curl "https://adventofcode.com/${YEAR}/day/$*/input" --cookie "session=${COOKIE}" -o ${YEAR}/$*/.input
@@ -50,19 +52,17 @@ clean:  ## go clean
 	go clean
 
 tools:  ## fetch and install all required tools
-	go get -u golang.org/x/tools/cmd/goimports
 	go get -u github.com/suntong/html2md
-
-update-dependencies:    ## update golang dependencies
-	dep ensure
 
 build: $(BUILD_JOBS)
 
 $(YEAR)/build-%:
 	make ${YEAR}/$*/main.o
 
-%.o:
-	go build $*.go -o bin/$*.o
+$(OBJECTS):
+
+%.o: %.go
+	go build -o bin/$*.o $*.go
 
 test: ## generate grpc code and mocks and run all tests
 	go test -v ./...
