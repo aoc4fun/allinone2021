@@ -1,0 +1,108 @@
+<html>
+
+<style>
+.ok {
+    color:green;
+}
+.failed {
+    color:red;
+}
+</style>
+<script src="framework.js" ></script>
+<script src="input_2.js" ></script>
+<script>
+
+function process_move(position, move){
+    var [direction, number] = move.split(" ");
+    var x = position.x;
+    var y = position.y;
+    if(direction == "forward"){
+        x += +number;
+    }
+    if(direction == "down"){
+        y += +number;
+    }
+    if(direction == "up"){
+        y -= +number;
+        if (y < 0) y = 0;
+    }
+    return {x:x, y:y};
+}
+
+assertObjectsEquals("move forward", {x:1, y:0}, process_move({x:0,y:0}, "forward 1"));
+assertObjectsEquals("move forward several cells", {x:5, y:0}, process_move({x:0,y:0}, "forward 5"));
+
+assertObjectsEquals("move down several cells", {x:0, y:5}, process_move({x:0,y:0}, "down 5"));
+
+assertObjectsEquals("move up several cells", {x:0, y:1}, process_move({x:0,y:5}, "up 4"));
+
+assertObjectsEquals("move up above sea level", {x:0, y:0}, process_move({x:0,y:5}, "up 10"));
+
+function solve_puzzle(puzzle){
+    var moves = puzzle.split("\n");
+    var position = {x:0, y:0};
+    moves.forEach(move => position = process_move(position, move));
+    return position;
+}
+
+assertObjectsEquals("solve example puzzle", {x:15, y:10}, solve_puzzle(`forward 5
+down 5
+forward 8
+up 3
+down 8
+forward 2`));
+
+
+var solution = solve_puzzle(puzzle);
+
+sysout("Final location : ", JSON.stringify(solution), EOL);
+sysout("Solution : ", solution.x * solution.y, EOL);
+
+
+function process_aim_move(position, move){
+    var [direction, number] = move.split(" ");
+    var x = position.x;
+    var y = position.y;
+    var aim = position.aim;
+    if(direction == "forward"){
+        x += +number;
+        y += aim * +number;
+        if (y < 0) y = 0;
+    }
+    if(direction == "down"){
+        aim += +number
+    }
+    if(direction == "up"){
+        aim -= +number
+    }
+    return {x:x, y:y, aim:aim};
+}
+
+
+assertObjectsEquals("move aim up ", {x:0, y:0, aim:-4}, process_aim_move({x:0,y:0, aim:0}, "up 4"));
+assertObjectsEquals("move aim down ", {x:0, y:0, aim:4}, process_aim_move({x:0,y:0, aim:0}, "down 4"));
+
+assertObjectsEquals("move aim forward ", {x:4, y:16, aim:4}, process_aim_move({x:0,y:0, aim:4}, "forward 4"));
+assertObjectsEquals("move aim forward above sea level", {x:4, y:0, aim:-4}, process_aim_move({x:0,y:0, aim:-4}, "forward 4"));
+
+function solve_aim_puzzle(puzzle){
+    var moves = puzzle.split("\n");
+    var position = {x:0, y:0, aim:0};
+    moves.forEach(move => position = process_aim_move(position, move));
+    return position;
+}
+
+assertObjectsEquals("solve example puzzle - aim", {x:15, y:60, aim:10}, solve_aim_puzzle(`forward 5
+down 5
+forward 8
+up 3
+down 8
+forward 2`));
+
+var solution = solve_aim_puzzle(puzzle);
+sysout("Final aim location : ", JSON.stringify(solution), EOL);
+sysout("Aim solution : ", solution.x * solution.y, EOL);
+
+</script>
+
+</html>
