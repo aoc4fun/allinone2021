@@ -16,11 +16,8 @@ test_data = """00100
 def compute_epsilon_from_gamma(gamma):
     return "".join([str(1-int(i)) for i in gamma])
 
-def consumption(data,oxygen=True):
-    if oxygen:
-        return "".join(["0" if colonne.count("0")>colonne.count("1") else "1" for colonne in zip(*data)])
-    else:
-        return "".join(["0" if colonne.count("0")>colonne.count("1") else "1" for colonne in zip(*data)])
+def consumption(data):
+    return "".join(["0" if colonne.count("0")>colonne.count("1") else "1" for colonne in zip(*data)])
 
 def filternumber(rawdata,position,searchdata):
     return [data for data in rawdata if data[position]==searchdata]
@@ -28,7 +25,7 @@ def filternumber(rawdata,position,searchdata):
 def filterCO2(rawdata):
     step=0
     while (len(rawdata)>1):
-        rawdata=filternumber(rawdata, step, compute_epsilon_from_gamma(consumption(rawdata,False))[step])
+        rawdata=filternumber(rawdata, step, compute_epsilon_from_gamma(consumption(rawdata))[step])
         step+=1
     return (int(rawdata[0], 2))
 
