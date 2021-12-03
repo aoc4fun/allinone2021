@@ -1,0 +1,277 @@
+<html>
+
+<style>
+.ok {
+    color:green;
+}
+.failed {
+    color:red;
+}
+</style>
+<script src="framework.js" ></script>
+<script src="input_3.js" ></script>
+<script>
+
+function add_measurment(measurment, accumulator){
+    measurment_number = measurment.split("").map(Number);
+    for(var i = 0; i < measurment_number.length; i++){
+        measurment_number[i] += accumulator[i] || 0;
+    }
+    return measurment_number;
+}
+
+assertObjectsEquals("add first measurment", [1, 0], add_measurment("10", [0,0]));
+assertObjectsEquals("add second measurment", [1, 1], add_measurment("01", [1,0]));
+assertObjectsEquals("add long measurments", [1,0,1,0,1,1,1,1,1,0,0,1], add_measurment("101011111001", []));
+
+function add_measurments(measurments) {
+    var accumulator = [];
+    measurments.forEach(measurment => accumulator = add_measurment(measurment, accumulator));
+    return accumulator;
+}
+
+assertObjectsEquals("add measurments list", [3,1,1], add_measurments(["101", "110", "100"]));
+
+function compute_gamma(measurments){
+    var accumulator = add_measurments(measurments);
+    for(var i = 0 ; i < accumulator.length; i ++){
+        if (accumulator[i] >= measurments.length / 2){
+            accumulator[i] = 1;
+        }else{
+            accumulator[i] = 0;
+        }
+    }
+    return accumulator;
+}
+
+assertObjectsEquals("compute gamma", [1,0,0], compute_gamma(["101", "110", "100"]));
+assertObjectsEquals("compute example gamma", [1,0,1,1,0], compute_gamma(`00100
+11110
+10110
+10111
+10101
+01111
+00111
+11100
+10000
+11001
+00010
+01010`.split("\n")));
+
+function compute_decimal_gamma(measurments){
+    return parseInt(compute_gamma(measurments).join(""), 2);
+}
+
+assertObjectsEquals("compute example decimal gamma", 22, compute_decimal_gamma(`00100
+11110
+10110
+10111
+10101
+01111
+00111
+11100
+10000
+11001
+00010
+01010`.split("\n")))
+
+function compute_epsilon(measurments){
+    var gamma = compute_gamma(measurments);
+    for(var i = 0 ; i < gamma.length; i ++){
+        if (gamma[i] == 1){
+            gamma[i] = 0;
+        }else{
+            gamma[i] = 1;
+        }
+    }
+    return gamma;
+}
+
+assertObjectsEquals("compute example epsilon", [0,1,0,0,1], compute_epsilon(`00100
+11110
+10110
+10111
+10101
+01111
+00111
+11100
+10000
+11001
+00010
+01010`.split("\n")))
+
+function compute_decimal_epsilon(measurments){
+    return parseInt(compute_epsilon(measurments).join(""), 2);
+}
+
+assertObjectsEquals("compute example decimal epsilon", 9, compute_decimal_epsilon(`00100
+11110
+10110
+10111
+10101
+01111
+00111
+11100
+10000
+11001
+00010
+01010`.split("\n")))
+
+var gamma = compute_decimal_gamma(puzzle);
+var epsilon = compute_decimal_epsilon(puzzle);
+sysout("Puzzle gamma : ", gamma, EOL);
+sysout("Puzzle epsilon : ", epsilon, EOL);
+sysout("Puzzle power: ", gamma * epsilon, EOL);
+
+
+function filter_gaz_step(measurments, step, mask_function){
+    var mask = mask_function(measurments);
+    var result = [];
+    measurments.forEach(measurment => {
+        if (measurment[step] == mask[step]) {
+            result.push(measurment);
+        }
+    });
+    return result;
+}
+
+function filter_oxygen_step(measurments, step){
+    return filter_gaz_step(measurments, step, compute_gamma);
+}
+
+assertObjectsEquals("filter example oxygen - step 1", `11110
+10110
+10111
+10101
+11100
+10000
+11001`.split("\n"), filter_oxygen_step(`00100
+11110
+10110
+10111
+10101
+01111
+00111
+11100
+10000
+11001
+00010
+01010`.split("\n"), 0))
+
+
+assertObjectsEquals("filter example oxygen - step 2", `10110
+10111
+10101
+10000`.split("\n"), filter_oxygen_step(`11110
+10110
+10111
+10101
+11100
+10000
+11001`.split("\n"), 1))
+
+assertObjectsEquals("filter example oxygen - step 3", `10110
+10111
+10101`.split("\n"), filter_oxygen_step(`10110
+10111
+10101
+10000`.split("\n"), 2))
+
+assertObjectsEquals("filter example oxygen - step 4", `10110
+10111`.split("\n"), filter_oxygen_step(`10110
+10111
+10101`.split("\n"), 3))
+
+
+assertObjectsEquals("compute gamma when equality", [1,0,1,1,1], compute_gamma(`10110
+10111`.split("\n")));
+
+assertObjectsEquals("filter example oxygen - step 5", `10111`.split("\n"), filter_oxygen_step(`10110
+10111`.split("\n"), 4))
+
+function filter_gaz(measurments, filter_gaz_step, step = 0){
+    if (measurments.length == 1){
+        return parseInt(measurments[0], 2);
+    }else{
+        return filter_gaz(filter_gaz_step(measurments, step), filter_gaz_step, step+1);
+    }
+}
+
+function filter_oxygen(measurments){
+   return filter_gaz(measurments, filter_oxygen_step);
+}
+
+
+
+assertObjectsEquals("filter example oxygen - all steps", 23, filter_oxygen(`00100
+11110
+10110
+10111
+10101
+01111
+00111
+11100
+10000
+11001
+00010
+01010`.split("\n")))
+
+
+function filter_co2_step(measurments, step){
+    return filter_gaz_step(measurments, step, compute_epsilon);
+}
+
+assertObjectsEquals("filter example CO2 - step 1", `00100
+01111
+00111
+00010
+01010`.split("\n"), filter_co2_step(`00100
+11110
+10110
+10111
+10101
+01111
+00111
+11100
+10000
+11001
+00010
+01010`.split("\n"), 0))
+
+assertObjectsEquals("filter example CO2 - step 2", `01111
+01010`.split("\n"), filter_co2_step(`00100
+01111
+00111
+00010
+01010`.split("\n"), 1))
+
+assertObjectsEquals("filter example CO2 - step 3", `01010`.split("\n"), filter_co2_step(`01111
+01010`.split("\n"), 2))
+
+function filter_co2(measurments){
+    return filter_gaz(measurments, filter_co2_step);
+}
+
+assertObjectsEquals("filter example CO2 - all steps", 10, filter_co2(`00100
+11110
+10110
+10111
+10101
+01111
+00111
+11100
+10000
+11001
+00010
+01010`.split("\n")))
+
+var oxygen = filter_oxygen(puzzle);
+var co2 = filter_co2(puzzle);
+sysout("Solution oxygen : ", oxygen, EOL);
+sysout("Solution co2 : ", co2, EOL);
+sysout("Solution life support : ", oxygen * co2, EOL);
+
+
+</script>
+
+</html>
