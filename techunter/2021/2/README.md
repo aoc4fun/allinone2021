@@ -6,9 +6,9 @@
 - [[Settings]](/2021/settings)
 - [[Log Out]](/2021/auth/logout)
 
-TecHunter 2\*
+TecHunter 3\*
 
-# int y= [2021](/2021);
+# {'year': [2021](/2021)}
 
 - [[Calendar]](/2021)
 - [[AoC++]](/2021/support)
@@ -17,8 +17,6 @@ TecHunter 2\*
 - [[Stats]](/2021/stats)
 
 Our [sponsors](/2021/sponsors) help make Advent of Code possible:
-
-[ING](https://www.ing.jobs/Global/Careers/expertise/Tech.htm) \- At ING, you develop software and yourself
 
 ## \-\-\- Day 2: Dive! ---
 
@@ -57,10 +55,41 @@ After following these instructions, you would have a horizontal position of `15`
 
 Calculate the horizontal position and depth you would have after following the planned course. _What do you get if you multiply your final horizontal position by your final depth?_
 
-To begin, [get your puzzle input](2/input).
+Your puzzle answer was `2322630`.
+
+The first half of this puzzle is complete! It provides one gold star: \*
+
+## \-\-\- Part Two ---
+
+Based on your calculations, the planned course doesn't seem to make any sense. You find the submarine manual and discover that the process is actually slightly more complicated.
+
+In addition to horizontal position and depth, you'll also need to track a third value, _aim_, which also starts at `0`. The commands also mean something entirely different than you first thought:
+
+- `down X` _increases_ your aim by `X` units.
+- `up X` _decreases_ your aim by `X` units.
+- `forward X` does two things:
+  - It increases your horizontal position by`X` units.
+  - It increases your depth by your aim_multiplied by_ `X`.
+
+Again note that since you're on a submarine, `down` and `up` do the opposite of what you might expect: "down" means aiming in the positive direction.
+
+Now, the above example does something different:
+
+- `forward 5` adds `5` to your horizontal position, a total of `5`. Because your aim is `0`, your depth does not change.
+- `down 5` adds `5` to your aim, resulting in a value of `5`.
+- `forward 8` adds `8` to your horizontal position, a total of `13`. Because your aim is `5`, your depth increases by `8*5=40`.
+- `up 3` decreases your aim by `3`, resulting in a value of `2`.
+- `down 8` adds `8` to your aim, resulting in a value of `10`.
+- `forward 2` adds `2` to your horizontal position, a total of `15`. Because your aim is `10`, your depth increases by `2*10=20` to a total of `60`.
+
+After following these new instructions, you would have a horizontal position of `15` and a depth of `60`. (Multiplying these produces `<em>900</em>`.)
+
+Using this new interpretation of the commands, calculate the horizontal position and depth you would have after following the planned course. _What do you get if you multiply your final horizontal position by your final depth?_
 
 Answer:
 
+Although it hasn't changed, you can still [get your puzzle input](2/input).
+
 You can also [Shareon
-[Twitter](https://twitter.com/intent/tweet?text=%22Dive%21%22+%2D+Day+2+%2D+Advent+of+Code+2021&url=https%3A%2F%2Fadventofcode%2Ecom%2F2021%2Fday%2F2&related=ericwastl&hashtags=AdventOfCode) [Mastodon](javascript:void(0);)] this puzzle.
+[Twitter](https://twitter.com/intent/tweet?text=I%27ve+completed+Part+One+of+%22Dive%21%22+%2D+Day+2+%2D+Advent+of+Code+2021&url=https%3A%2F%2Fadventofcode%2Ecom%2F2021%2Fday%2F2&related=ericwastl&hashtags=AdventOfCode) [Mastodon](javascript:void(0);)] this puzzle.
 
