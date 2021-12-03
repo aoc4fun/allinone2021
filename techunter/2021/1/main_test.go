@@ -2,11 +2,25 @@ package main
 
 import "testing"
 
+const (
+	FirstCaseResult  = 7
+	SecondCaseResult = 5
+)
+
 func TestFirstCase(t *testing.T) {
 
-	ret := FirstCase("./2021/1/.test")
-	if ret != 7 {
-		t.Errorf("First case was incorrect, got %d want %d", ret, 7)
+	ret := FirstCase(".test")
+	if ret != FirstCaseResult {
+		t.Errorf("First case was incorrect, got %d want %d", ret, FirstCaseResult)
+	}
+
+}
+
+func TestSecondCase(t *testing.T) {
+
+	ret := SecondCase(".test")
+	if ret != SecondCaseResult {
+		t.Errorf("First case was incorrect, got %d want %d", ret, SecondCaseResult)
 	}
 
 }
