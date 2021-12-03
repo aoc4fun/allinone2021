@@ -4,3 +4,5 @@ build/
 out/
 *.log
 .input
+bin/
+*.o
