@@ -16,5 +16,8 @@ func TestFirstCase(t *testing.T) {
 }
 
 func TestSecondCase(t *testing.T) {
-
+	horizontalPosition, depth := SecondCase(".test")
+	if horizontalPosition != 15 || depth != 60 {
+		t.Errorf("First case was incorrect, got %d,%d want %d,%d", horizontalPosition, depth, 15, 60)
+	}
 }
