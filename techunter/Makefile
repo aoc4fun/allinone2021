@@ -5,7 +5,11 @@ THIS_YEAR	:= $(shell date '+%Y')
 OFFSET		:= $(shell [ ${MONTH} -eq 12 ] && echo 0 || echo 1)
 YEAR		:= $(shell expr $(THIS_YEAR) - $(OFFSET))
 DAY			:= $(shell date '+%-d')
-SEQ			:= $(shell seq 1 $([${THIS_YEAR} -eq ${YEAR} ] && expr ${DAY} || expr 31))
+ifeq ($(THIS_YEAR), $(YEAR))
+SEQ			:= $(shell seq 1 $(DAY))
+else
+SEQ			:= $(shell seq 1 31)
+endif
 PREPARE_JOBS:= $(addprefix $(YEAR)/prepare-,${SEQ})
 BUILD_JOBS	:= $(addprefix $(YEAR)/build-,${SEQ})
 RUN_JOBS	:= $(addprefix $(YEAR)/run-,${SEQ})
@@ -40,8 +44,11 @@ endif
 	[ -f "${YEAR}/$*/.input" ] || curl "https://adventofcode.com/${YEAR}/day/$*/input" --cookie "session=${COOKIE}" -o ${YEAR}/$*/.input
 
 env:  ## Print useful environment variables to stdout
+	echo MONTH		:= $(shell echo $(MONTH))
+	echo DAY		:= $(shell echo $(DAY))
 	echo OFFSET		:= $(shell echo $(OFFSET))
 	echo YEAR		:= $(YEAR)
+	echo SEQ		:= $(SEQ)
 	echo $(PREPARE_JOBS)
 	echo $(BUILD_JOBS)
 	echo $(TEST_JOBS)
