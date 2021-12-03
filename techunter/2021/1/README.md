@@ -1,21 +1,24 @@
-# [Advent of Code](http://adventofcode.com/)
+# [Advent of Code](/)
 
-- [[About]](http://adventofcode.com/2021/about)
-- [[Events]](http://adventofcode.com/2021/events)
+- [[About]](/2021/about)
+- [[Events]](/2021/events)
 - [[Shop]](https://teespring.com/stores/advent-of-code)
-- [[Log In]](http://adventofcode.com/2021/auth/login)
+- [[Settings]](/2021/settings)
+- [[Log Out]](/2021/auth/logout)
 
-# // [2021](http://adventofcode.com/2021)
+TecHunter 1\*
 
-- [[Calendar]](http://adventofcode.com/2021)
-- [[AoC++]](http://adventofcode.com/2021/support)
-- [[Sponsors]](http://adventofcode.com/2021/sponsors)
-- [[Leaderboard]](http://adventofcode.com/2021/leaderboard)
-- [[Stats]](http://adventofcode.com/2021/stats)
+# {year=> [2021](/2021)}
 
-Our [sponsors](http://adventofcode.com/2021/sponsors) help make Advent of Code possible:
+- [[Calendar]](/2021)
+- [[AoC++]](/2021/support)
+- [[Sponsors]](/2021/sponsors)
+- [[Leaderboard]](/2021/leaderboard)
+- [[Stats]](/2021/stats)
 
-[Replit](https://2021-aoc-templates.util.repl.co/) \- Code and host in your browser with no setup in Python, React, Kaboom.js, Java, C, Nix, you name it, even Solidity. Happy coding!
+Our [sponsors](/2021/sponsors) help make Advent of Code possible:
+
+[13\|37](https://tretton37.com/join) \- Happy coding to everyone in this year's Advent of Code!
 
 ## \-\-\- Day 1: Sonar Sweep ---
 
@@ -53,15 +56,15 @@ To do this, count _the number of times a depth measurement increases_ from the p
 
 ```
 199 (N/A - no previous measurement)
-200 (increased)
-208 (increased)
-210 (increased)
+200 (<em>increased</em>)
+208 (<em>increased</em>)
+210 (<em>increased</em>)
 200 (decreased)
-207 (increased)
-240 (increased)
-269 (increased)
+207 (<em>increased</em>)
+240 (<em>increased</em>)
+269 (<em>increased</em>)
 260 (decreased)
-263 (increased)
+263 (<em>increased</em>)
 
 ```
 
@@ -69,7 +72,56 @@ In this example, there are _`7`_ measurements that are larger than the previous 
 
 _How many measurements are larger than the previous measurement?_
 
-To play, please identify yourself via one of these services:
+Your puzzle answer was `1832`.
 
-[[GitHub]](http://adventofcode.com/auth/github) [[Google]](http://adventofcode.com/auth/google) [[Twitter]](http://adventofcode.com/auth/twitter) [[Reddit]](http://adventofcode.com/auth/reddit)\- [[How Does Auth Work?]](http://adventofcode.com/about#faq_auth)
+The first half of this puzzle is complete! It provides one gold star: \*
+
+## \-\-\- Part Two ---
+
+Considering every single measurement isn't as useful as you expected: there's just too much noise in the data.
+
+Instead, consider sums of a _three-measurement sliding window_. Again considering the above example:
+
+```
+199  A
+200  A B
+208  A B C
+210    B C D
+200  E   C D
+207  E F   D
+240  E F G
+269    F G H
+260      G H
+263        H
+
+```
+
+Start by comparing the first and second three-measurement windows. The measurements in the first window are marked `A` ( `199`, `200`, `208`); their sum is `199 + 200 + 208 = 607`. The second window is marked `B` ( `200`, `208`, `210`); its sum is `618`. The sum of measurements in the second window is larger than the sum of the first, so this first comparison _increased_.
+
+Your goal now is to count _the number of times the sum of measurements in this sliding window increases_ from the previous sum. So, compare `A` with `B`, then compare `B` with `C`, then `C` with `D`, and so on. Stop when there aren't enough measurements left to create a new three-measurement sum.
+
+In the above example, the sum of each three-measurement window is as follows:
+
+```
+A: 607 (N/A - no previous sum)
+B: 618 (<em>increased</em>)
+C: 618 (no change)
+D: 617 (decreased)
+E: 647 (<em>increased</em>)
+F: 716 (<em>increased</em>)
+G: 769 (<em>increased</em>)
+H: 792 (<em>increased</em>)
+
+```
+
+In this example, there are _`5`_ sums that are larger than the previous sum.
+
+Consider sums of a three-measurement sliding window. _How many sums are larger than the previous sum?_
+
+Answer:
+
+Although it hasn't changed, you can still [get your puzzle input](1/input).
+
+You can also [Shareon
+[Twitter](https://twitter.com/intent/tweet?text=I%27ve+completed+Part+One+of+%22Sonar+Sweep%22+%2D+Day+1+%2D+Advent+of+Code+2021&url=https%3A%2F%2Fadventofcode%2Ecom%2F2021%2Fday%2F1&related=ericwastl&hashtags=AdventOfCode) [Mastodon](javascript:void(0);)] this puzzle.
 

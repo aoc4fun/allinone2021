@@ -8,6 +8,7 @@ DAY			:= $(shell date '+%-d')
 SEQ			:= $(shell seq 1 $([${THIS_YEAR} -eq ${YEAR} ] && expr ${DAY} || expr 31))
 PREPARE_JOBS:= $(addprefix $(YEAR)/prepare-,${SEQ})
 BUILD_JOBS	:= $(addprefix $(YEAR)/build-,${SEQ})
+RUN_JOBS	:= $(addprefix $(YEAR)/run-,${SEQ})
 TEST_JOBS	:= $(addprefix $(YEAR)/test-,${SEQ})
 URL			:= $(shell echo 'https://adventofcode.com/${YEAR}/day')
 VERSION		?= $(shell git describe --tags --always --dirty --match=v* 2> /dev/null || cat $(PWD)/.version 2> /dev/null || echo v0)
@@ -26,7 +27,7 @@ help:   ## show this help
 	@echo 'targets:'
 	@egrep '^(.+)\:\ .*##\ (.+)' ${MAKEFILE_LIST} | sed 's/:.*##/#/' | column -t -c 2 -s '#'
 
-all:  clean tools prepare build test ## clean, format, build and unit test
+all:  clean run test ## clean, format, build and unit test
 
 prepare: env $(PREPARE_JOBS)
 
@@ -35,7 +36,7 @@ ifeq ($(strip $(COOKIE)),)
 	echo missing COOKIE env && exit 1
 endif
 	mkdir -p $(YEAR)/$*
-	[ -f "${YEAR}/$*/README.md" ] || html2md -i "https://adventofcode.com/${YEAR}/day/$*" > ${YEAR}/$*/README.md
+	[ -f "${YEAR}/$*/README.md" ] || (curl "https://adventofcode.com/${YEAR}/day/$*" --cookie "session=${COOKIE}" -o ${YEAR}/$*/.html && html2md -i "${YEAR}/$*/.html" > ${YEAR}/$*/README.md && rm ${YEAR}/$*/.html)
 	[ -f "${YEAR}/$*/.input" ] || curl "https://adventofcode.com/${YEAR}/day/$*/input" --cookie "session=${COOKIE}" -o ${YEAR}/$*/.input
 
 env:  ## Print useful environment variables to stdout
@@ -55,9 +56,12 @@ tools:  ## fetch and install all required tools
 	go get -u github.com/suntong/html2md
 
 build: $(BUILD_JOBS)
+run: $(RUN_JOBS)
 
 $(YEAR)/build-%:
 	make ${YEAR}/$*/main.o
+$(YEAR)/run-%:
+	go run ${YEAR}/$*/main.go
 
 $(OBJECTS):
 
