@@ -60,7 +60,10 @@
 
     assertObjectsEquals("Empty board is not winning", false, createBoard("1 2\n3 4").isWinning());
 
-
+    var board = createBoard("1 2\n3 4");
+    board.mark("1");
+    assertObjectsEquals("One number marked is not winning", false, board.isWinning());
+    
 </script>
 
 </html>
