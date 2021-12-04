@@ -34,6 +34,11 @@
             return this.input.split("\n").map(line => line.split(" "));
         }
 
+        getColumns(){
+            var matrix = this.getMatrix();
+            return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
+        }
+
         
     }
 
@@ -48,6 +53,7 @@
     assertObjectsEquals("Number marked", true, board.isMarked("1"));
 
     assertObjectsEquals("Get matrix", [["1", "2"], ["3", "4"]], createBoard("1 2\n3 4").getMatrix());
+    assertObjectsEquals("Get columns", [["1", "3"], ["2", "4"]], createBoard("1 2\n3 4").getColumns());
 
 </script>
 
