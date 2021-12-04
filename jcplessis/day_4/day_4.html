@@ -105,7 +105,7 @@
     [7, 4, 9, 5, 11, 17, 23, 2, 0, 14, 21, 24].forEach(number => board.mark(""+number));
     assertObjectsEquals("Solve winning example board", true, board.isWinning())
 
-    function solveGame(numbers, boardsInput){
+    function winGame(numbers, boardsInput){
         var boards = [];
         boardsInput.split("\n\n").forEach(boardInput => boards.push(new Board(boardInput)));
         for(const number of numbers.split(",")){
@@ -118,7 +118,25 @@
         }
     }
 
-    assertObjectsEquals("Solve example", 4512, solveGame("7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1", `22 13 17 11  0
+    function loseGame(numbers, boardsInput){
+        var boards = [];
+        boardsInput.split("\n\n").forEach(boardInput => boards.push(new Board(boardInput)));
+        for(const number of numbers.split(",")){
+            
+            for(var i = boards.length-1; i >= 0; i--){
+                var board = boards[i];
+                board.mark(number);
+                if (board.isWinning()){
+                    if(boards.length == 1){
+                        return boards[0].getSumOfUnmarkedNumbers() * number;
+                    }
+                    boards.splice(i, 1);
+                }
+            }
+        }
+    }
+
+    assertObjectsEquals("Win example", 4512, winGame("7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1", `22 13 17 11  0
  8  2 23  4 24
 21  9 14 16  7
  6 10  3 18  5
@@ -136,8 +154,26 @@
 22 11 13  6  5
  2  0 12  3  7`))
 
-    sysout("Solution for part one : ", solveGame(numbers, boards));
+    sysout("Solution for part one : ", winGame(numbers, boards));
 
+
+    assertObjectsEquals("Lose example", 1924, loseGame("7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1", `22 13 17 11  0
+ 8  2 23  4 24
+21  9 14 16  7
+ 6 10  3 18  5
+ 1 12 20 15 19
+
+ 3 15  0  2 22
+ 9 18 13 17  5
+19  8  7 25 23
+20 11 10 24  4
+14 21 16 12  6
+
+14 21 17 24  4
+10 16 15  9 19
+18  8 23 26 20
+22 11 13  6  5
+ 2  0 12  3  7`))
 </script>
 
 </html>
