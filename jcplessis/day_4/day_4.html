@@ -39,8 +39,12 @@
             return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
         }
 
+        isWinningNumbers(matrix){
+            return matrix.map(numbers => numbers.map(number => this.isMarked(number)).every(Boolean)).some(Boolean)
+        }
+
         isWinning(){
-            return this.getLines().map(line => line.map(number => this.isMarked(number)).every(Boolean)).some(Boolean);
+            return this.isWinningNumbers(this.getLines()) || this.isWinningNumbers(this.getColumns());
         }
         
     }
@@ -68,6 +72,11 @@
     board.mark("1");
     board.mark("2");
     assertObjectsEquals("Line marked IS winning", true, board.isWinning());
+
+    var board = createBoard("1 2\n3 4");
+    board.mark("4");
+    board.mark("2");
+    assertObjectsEquals("Column marked IS winning", true, board.isWinning());
 </script>
 
 </html>
