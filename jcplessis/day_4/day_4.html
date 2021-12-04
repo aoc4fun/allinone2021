@@ -29,6 +29,12 @@
         isMarked(number){
             return this.marked.includes(number);
         }
+
+        getMatrix(){
+            return this.input.split("\n").map(line => line.split(" "));
+        }
+
+        
     }
 
     function createBoard(input){
@@ -40,6 +46,9 @@
     var board = createBoard("1 2 3 4");
     board.mark("1");
     assertObjectsEquals("Number marked", true, board.isMarked("1"));
+
+    assertObjectsEquals("Get matrix", [["1", "2"], ["3", "4"]], createBoard("1 2\n3 4").getMatrix());
+
 </script>
 
 </html>
