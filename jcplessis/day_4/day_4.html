@@ -20,6 +20,10 @@
         toString(){
             return this.input;
         }
+
+        isMarked(number){
+            return false;
+        }
     }
 
     function createBoard(input){
@@ -27,6 +31,7 @@
     }
 
     assertObjectsEquals("Simple board", "1 2 3 4", createBoard("1 2 3 4").toString());
+    assertObjectsEquals("Number not marked", false, createBoard("1 2 3 4").isMarked("1"));
 </script>
 
 </html>
