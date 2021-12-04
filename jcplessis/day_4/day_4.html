@@ -39,6 +39,9 @@
             return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
         }
 
+        isWinning(){
+            return false;
+        }
         
     }
 
@@ -54,6 +57,9 @@
 
     assertObjectsEquals("Get lines", [["1", "2"], ["3", "4"]], createBoard("1 2\n3 4").getLines());
     assertObjectsEquals("Get columns", [["1", "3"], ["2", "4"]], createBoard("1 2\n3 4").getColumns());
+
+    assertObjectsEquals("Empty board is not winning", false, createBoard("1 2\n3 4").isWinning());
+
 
 </script>
 
