@@ -30,12 +30,12 @@
             return this.marked.includes(number);
         }
 
-        getMatrix(){
+        getLines(){
             return this.input.split("\n").map(line => line.split(" "));
         }
 
         getColumns(){
-            var matrix = this.getMatrix();
+            var matrix = this.getLines();
             return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
         }
 
@@ -52,7 +52,7 @@
     board.mark("1");
     assertObjectsEquals("Number marked", true, board.isMarked("1"));
 
-    assertObjectsEquals("Get matrix", [["1", "2"], ["3", "4"]], createBoard("1 2\n3 4").getMatrix());
+    assertObjectsEquals("Get lines", [["1", "2"], ["3", "4"]], createBoard("1 2\n3 4").getLines());
     assertObjectsEquals("Get columns", [["1", "3"], ["2", "4"]], createBoard("1 2\n3 4").getColumns());
 
 </script>
