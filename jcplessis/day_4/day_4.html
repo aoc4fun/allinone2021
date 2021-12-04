@@ -15,14 +15,19 @@
     class Board{
        constructor(input){
             this.input = input;
+            this.marked = [];
         }
 
         toString(){
             return this.input;
         }
 
+        mark(number){
+            this.marked.push(number);
+        }
+
         isMarked(number){
-            return false;
+            return this.marked.includes(number);
         }
     }
 
@@ -32,6 +37,9 @@
 
     assertObjectsEquals("Simple board", "1 2 3 4", createBoard("1 2 3 4").toString());
     assertObjectsEquals("Number not marked", false, createBoard("1 2 3 4").isMarked("1"));
+    var board = createBoard("1 2 3 4");
+    board.mark("1");
+    assertObjectsEquals("Number marked", true, board.isMarked("1"));
 </script>
 
 </html>
