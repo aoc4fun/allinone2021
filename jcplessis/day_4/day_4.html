@@ -12,7 +12,21 @@
 <script src="input_4.js" ></script>
 <script>
 
+    class Board{
+       constructor(input){
+            this.input = input;
+        }
 
+        toString(){
+            return this.input;
+        }
+    }
+
+    function createBoard(input){
+        return new Board(input);
+    }
+
+    assertObjectsEquals("Simple board", "1 2 3 4", createBoard("1 2 3 4").toString());
 </script>
 
 </html>
