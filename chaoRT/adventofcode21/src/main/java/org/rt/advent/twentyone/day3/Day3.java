@@ -35,7 +35,7 @@ public class Day3 extends DayPuzzle {
     }
 
     public void readCommonByteAndConvert(Stream<String> stream) {
-        ByteArray array = new ByteArray();
+        array = new ByteArray();
         array.accumulateAll(stream);
 
     }
