@@ -40,7 +40,7 @@
         }
 
         isWinning(){
-            return false;
+            return this.getLines().map(line => line.map(number => this.isMarked(number)).every(Boolean)).some(Boolean);
         }
         
     }
@@ -63,7 +63,11 @@
     var board = createBoard("1 2\n3 4");
     board.mark("1");
     assertObjectsEquals("One number marked is not winning", false, board.isWinning());
-    
+
+    var board = createBoard("1 2\n3 4");
+    board.mark("1");
+    board.mark("2");
+    assertObjectsEquals("Line marked IS winning", true, board.isWinning());
 </script>
 
 </html>
