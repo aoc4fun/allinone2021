@@ -1,3 +1,7 @@
 #!/usr/bin/env ts-node
 
-console.log('Hello world!')
+import {part1} from "./part1";
+import {part2} from "./part2";
+
+part1()
+part2()
