@@ -12,6 +12,16 @@
 <script src="input_5.js" ></script>
 <script>
 
+    class VentMap{
+        keepLine(line){
+            var [from, to] = line.split(" -> ");
+            var [x1, y1] = from.split(",");
+            var [x2, y2] = to.split(",");
+            return y1 == y2;
+        }
+    }
+
+    assertObjectsEquals("Keep horizontal lines", true, new VentMap().keepLine("0,9 -> 5,9") )
    
 </script>
 
