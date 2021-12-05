@@ -13,17 +13,180 @@
 <script>
 
     class VentMap{
-        keepLine(line){
+        constructor(size=10){
+            this.cells = Array(size).fill().map(()=>Array(size).fill(0))
+        }
+
+        parseLine(line){
             var [from, to] = line.split(" -> ");
-            var [x1, y1] = from.split(",");
-            var [x2, y2] = to.split(",");
+            var [x1, y1] = from.split(",").map(Number);
+            var [x2, y2] = to.split(",").map(Number);
+            return [x1, y1, x2, y2];
+        }
+
+        isVerticalOrHorizontal(line){
+            var [x1, y1, x2, y2] = this.parseLine(line);
             return x1 == x2 || y1 == y2;
         }
-    }
 
-    assertObjectsEquals("Keep horizontal lines", true, new VentMap().keepLine("0,9 -> 5,9") )
-    assertObjectsEquals("Keep vertical lines", true, new VentMap().keepLine("1,0 -> 1,9") )
-   
+        toString(){
+            return this.cells.map(line => line.join("").replaceAll("0", ".")).join("\n");
+        }
+
+        toHtml(){
+            var result = "<table>";
+            for(const line of this.cells){
+                result += "<tr>";
+                for(const cell of line){
+                    result += "<td>" + cell + "</td>";
+                }
+                result += "</tr>";
+            }
+            result += "</table>";
+            return result;
+        }
+
+        treatHorizontalOrVerticalVent(ventLine){
+            var [x1, y1, x2, y2] = this.parseLine(ventLine);
+            if (x1 > x2){
+                [x1, x2] = [x2, x1];
+            }
+            if (y1 > y2){
+                [y1, y2] = [y2, y1];
+            }
+            for(var x = x1; x <= x2; x++){
+                for(var y = y1; y <= y2; y++){
+                    this.cells[y][x]++;
+                }
+            }
+        }
+
+        treatDescendingDiagonalVent(x1, y1, x2, y2){
+            for(var x = x1; x <= x2; x++){
+                this.cells[y1+x-x1][x]++;
+            }
+        }
+
+        treatAscendingDiagonalVent(x1, y1, x2, y2){
+            for(var x = x1; x <= x2; x++){
+                this.cells[y1-(x-x1)][x]++;
+            }
+        }
+
+        treatDiagonalVent(ventLine){
+            var [x1, y1, x2, y2] = this.parseLine(ventLine);
+            if (x1 > x2){
+                [x1, x2] = [x2, x1];
+                [y1, y2] = [y2, y1];
+            }
+            if(y1 < y2){
+                this.treatDescendingDiagonalVent(x1, y1, x2, y2);
+            }else{
+                this.treatAscendingDiagonalVent(x1, y1, x2, y2);
+            }
+        }
+
+        treatHorizontalOrVerticalVents(ventLines){
+            ventLines.split("\n").filter(ventLine => this.isVerticalOrHorizontal(ventLine)).forEach(ventLine => this.treatHorizontalOrVerticalVent(ventLine));
+        }
+
+        treatAllVents(ventLines){
+            this.treatHorizontalOrVerticalVents(ventLines);
+            ventLines.split("\n").filter(ventLine => !this.isVerticalOrHorizontal(ventLine)).forEach(ventLine => this.treatDiagonalVent(ventLine));
+        }
+
+        crossingPoints(){
+            var result = 0;
+            this.cells.forEach(line => line.filter(x => x >= 2).forEach(e => result++));
+            return result;
+        }
+    }
+ 
+    assertObjectsEquals("Keep horizontal lines", true, new VentMap().isVerticalOrHorizontal("0,9 -> 5,9") )
+    assertObjectsEquals("Keep vertical lines", true, new VentMap().isVerticalOrHorizontal("1,0 -> 1,9") )
+
+    assertObjectsEquals("Generate example empty board", `..........
+..........
+..........
+..........
+..........
+..........
+..........
+..........
+..........
+..........`, new VentMap(10).toString() );
+
+    var ventMap = new VentMap(10);
+    ventMap.treatHorizontalOrVerticalVent("0,9 -> 5,9");
+
+assertObjectsEquals("Generate example board with first vent", `..........
+..........
+..........
+..........
+..........
+..........
+..........
+..........
+..........
+111111....`, ventMap.toString() )
+
+var ventMap = new VentMap(10);
+    ventMap.treatHorizontalOrVerticalVents(`0,9 -> 5,9
+8,0 -> 0,8
+9,4 -> 3,4
+2,2 -> 2,1
+7,0 -> 7,4
+6,4 -> 2,0
+0,9 -> 2,9
+3,4 -> 1,4
+0,0 -> 8,8
+5,5 -> 8,2`);
+
+assertObjectsEquals("Generate example board with all horizontal or vertical vents", `.......1..
+..1....1..
+..1....1..
+.......1..
+.112111211
+..........
+..........
+..........
+..........
+222111....`, ventMap.toString() )
+
+    assertObjectsEquals("Count multiple vents points", 5, ventMap.crossingPoints());
+    
+
+    var ventMap = new VentMap(1000);
+    ventMap.treatHorizontalOrVerticalVents(input);
+    sysout("Solution for part one : ", ventMap.crossingPoints(), EOL);
+
+    var ventMap = new VentMap(10);
+    ventMap.treatAllVents(`0,9 -> 5,9
+8,0 -> 0,8
+9,4 -> 3,4
+2,2 -> 2,1
+7,0 -> 7,4
+6,4 -> 2,0
+0,9 -> 2,9
+3,4 -> 1,4
+0,0 -> 8,8
+5,5 -> 8,2`);
+
+    assertObjectsEquals("Generate example board with all vents", `1.1....11.
+.111...2..
+..2.1.111.
+...1.2.2..
+.112313211
+...1.2....
+..1...1...
+.1.....1..
+1.......1.
+222111....`, ventMap.toString() )
+
+    var ventMap = new VentMap(1000);
+    ventMap.treatAllVents(input);
+    sysout("Solution for part two : ", ventMap.crossingPoints(), EOL);
+
 </script>
 
 </html>
