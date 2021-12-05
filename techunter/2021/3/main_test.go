@@ -4,7 +4,7 @@ import "testing"
 
 const (
 	FirstCaseResult  = 198
-	SecondCaseResult = 5
+	SecondCaseResult = 230
 )
 
 func TestFirstCase(t *testing.T) {
