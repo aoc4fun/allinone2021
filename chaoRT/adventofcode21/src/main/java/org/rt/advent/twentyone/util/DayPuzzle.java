@@ -29,8 +29,8 @@ public abstract class DayPuzzle {
 
     }
 
-    public abstract String puzzle1();
-    public abstract String puzzle2();
+    public abstract String puzzle1() throws PuzzleFailedException;
+    public abstract String puzzle2() throws PuzzleFailedException;
 
     public static void runPuzzles(DayPuzzle day) {
         try {
@@ -47,6 +47,8 @@ public abstract class DayPuzzle {
     public static void display(String value) {
         System.out.println(value);
     }
+
+
 
 
 }

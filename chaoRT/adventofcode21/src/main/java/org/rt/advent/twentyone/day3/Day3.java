@@ -53,10 +53,7 @@ public class Day3 extends DayPuzzle {
         return calculateGammaRate()*calculateEpsilonRate();
     }
 
-    public static void main(String[] args) {
-        Day3 day = new Day3();
-        runPuzzles(day);
-    }
+
 
 
     public int calculateLifeSupportRating(Stream<String> stream) {
