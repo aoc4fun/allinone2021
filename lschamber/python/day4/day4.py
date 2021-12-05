@@ -1,5 +1,3 @@
-# Dummy file with usual AOC elements ( Reading input, Test and Executing Both parts solver )
-
 # Files
 INPUT_FILE = "./input.txt"
 TEST_FILE = "./test.txt"
