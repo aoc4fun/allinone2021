@@ -17,11 +17,12 @@
             var [from, to] = line.split(" -> ");
             var [x1, y1] = from.split(",");
             var [x2, y2] = to.split(",");
-            return y1 == y2;
+            return x1 == x2 || y1 == y2;
         }
     }
 
     assertObjectsEquals("Keep horizontal lines", true, new VentMap().keepLine("0,9 -> 5,9") )
+    assertObjectsEquals("Keep vertical lines", true, new VentMap().keepLine("1,0 -> 1,9") )
    
 </script>
 
