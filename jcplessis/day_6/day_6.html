@@ -1,0 +1,54 @@
+<html>
+
+<style>
+.ok {
+    color:green;
+}
+.failed {
+    color:red;
+}
+</style>
+<script src="framework.js" ></script>
+<script src="input_6.js" ></script>
+<script>
+
+function load_input(input){
+    var result = Array(9).fill(0);
+    input.split(",").map(Number).forEach(days => result[days] ++);
+    return result;
+}
+
+function next_day(days){
+    var result = Array(9).fill(0);
+    for(var i = 8; i > 0; i--){
+        result[i-1] = days[i];
+    }
+    result[6] += days[0];
+    result[8] += days[0];
+    return result;
+}
+
+function evolve(input, nbDays){
+    var days = load_input(input);
+    for(var i = 0; i < nbDays; i++){
+        days = next_day(days);
+    }
+    return days.reduce((a, b) => a + b);
+}
+
+assertObjectsEquals("Load example input", [0,1,1,2,1,0,0,0,0], load_input("3,4,3,1,2"));
+
+assertObjectsEquals("Example input - day 2 - no new spawn", [1,1,2,1,0,0,0,0,0], next_day([0,1,1,2,1,0,0,0,0]));
+assertObjectsEquals("Example input - day 3 - spawning", [1,2,1,0,0,0,1,0,1], next_day([1,1,2,1,0,0,0,0,0]));
+
+assertObjectsEquals("Example input - day 80 - result", 5934, evolve("3,4,3,1,2", 80));
+
+sysout("Solve puzzle part one : ", evolve(puzzle, 80), EOL);
+
+assertObjectsEquals("Example input - day 256 - result", 26984457539, evolve("3,4,3,1,2", 256));
+
+sysout("Solve puzzle part two : ", evolve(puzzle, 256), EOL);
+
+</script>
+
+</html>
