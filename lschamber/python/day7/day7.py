@@ -31,15 +31,15 @@ def computeFuelConsumption(maxDist):
 def computeFuelNeed2(data):
     #Precompute fuel consumption for distance to avoid multiple computations
     fuelConsumption = computeFuelConsumption(max(data))
-    #Dummy Approach. Test all positions one by one and keep the best one
-    #TODO: Find a more pythonic way to do it
-    optimalPosition = 0
-    optimalFuelConsumption = math.inf
-    for currentPos in range(max(data)+1):
-        fuelUsed = sum(map(lambda x: fuelConsumption[abs(x - currentPos)], data))
-        if(fuelUsed <= optimalFuelConsumption):
-            optimalPosition = currentPos
-            optimalFuelConsumption = fuelUsed
+
+    #Compute the fuel used for each position possible (May be optimised)
+    fuelUsedForEachPosition = [sum(map(lambda x: fuelConsumption[abs(x - currentPosition)], data)) for currentPosition in range(max(data)+1)]
+    #Retrieve the min of the list (optimal fuel usage)
+    optimalFuelConsumption = min(fuelUsedForEachPosition)
+    #Optimal crabs position is index where min occurs
+    optimalPosition = fuelUsedForEachPosition.index(optimalFuelConsumption)
+
+
     return optimalPosition, optimalFuelConsumption
 
     # -------- TEST ------------
