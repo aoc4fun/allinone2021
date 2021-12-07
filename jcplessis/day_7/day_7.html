@@ -1,0 +1,79 @@
+<html>
+
+<style>
+.ok {
+    color:green;
+}
+.failed {
+    color:red;
+}
+</style>
+<script src="framework.js" ></script>
+<script src="input_7.js" ></script>
+<script>
+
+function median(arr) {
+  const mid = Math.floor(arr.length / 2),
+    nums = [...arr].sort((a, b) => a - b);
+  return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2;
+};
+
+function compute_destination(positions){
+    return median(positions.split(",").map(Number));
+}
+
+
+function distance(from, to){
+    return Math.abs(from - to);
+}
+
+function compute_fuel_need_to_destination(positions, destination, fuel_function){
+    var result = 0;
+    for(var position of positions.split(",").map(Number)){
+        result += fuel_function(position, destination);
+    }
+    return result;
+}
+
+function compute_fuel_needed(positions){
+    var destination = compute_destination(positions);
+    return compute_fuel_need_to_destination(positions, destination, distance);
+}
+
+function compute_exponential_distance(from, to){
+    var dist = distance(from, to);
+    return (dist+1)*dist/2;
+}
+
+function compute_exponential_fuel(positions){
+    var positionsInt = positions.split(",").map(Number);
+    var min = Math.min(...positionsInt);
+    var max = Math.max(...positionsInt);
+    var result = compute_fuel_need_to_destination(positions, 0, compute_exponential_distance);
+    for(var i = min; i <= max; i++){
+        var fuel = compute_fuel_need_to_destination(positions, i, compute_exponential_distance);
+        if (fuel < result) {
+            result = fuel;
+       }
+    }
+    return result;
+}
+
+assertObjectsEquals("Compute destination", 2, compute_destination("16,1,2,0,4,2,7,1,2,14"));
+
+assertObjectsEquals("Compute sum of distance", 37, compute_fuel_needed("16,1,2,0,4,2,7,1,2,14"));
+
+sysout("Destination for part one : ", compute_destination(puzzle), EOL);
+sysout("Fuel needed for part one : ", compute_fuel_needed(puzzle), EOL);
+
+assertObjectsEquals("Compute exponential fuel", 66, compute_exponential_distance(16, 5));
+
+
+assertObjectsEquals("Compute example exponential fuel", 168, compute_exponential_fuel("16,1,2,0,4,2,7,1,2,14"));
+
+sysout("Fuel needed for part two : ", compute_exponential_fuel(puzzle), EOL);
+
+
+</script>
+
+</html>
