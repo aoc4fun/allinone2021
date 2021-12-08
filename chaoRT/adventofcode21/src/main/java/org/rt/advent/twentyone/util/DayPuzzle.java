@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 public abstract class DayPuzzle {
@@ -16,6 +17,9 @@ public abstract class DayPuzzle {
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
         InputStream is = classloader.getResourceAsStream(getClass().getSimpleName().toLowerCase()+".txt");
         return new BufferedReader(new InputStreamReader(is));
+    }
+    public int[] getDayStringAsIntArray() throws IOException {
+        return Arrays.stream(getDayStream().readLine().split(",")).mapToInt(Integer::parseInt).toArray();
     }
 
     public URI getDayInput() throws IOException {
