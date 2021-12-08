@@ -1,0 +1,141 @@
+<html>
+
+<style>
+.ok {
+    color:green;
+}
+.failed {
+    color:red;
+}
+</style>
+<script src="framework.js" ></script>
+<script src="input_8.js" ></script>
+<script>
+
+function find_easy_numbers(input){
+    var result = 0;
+    for(line of input.split("\n")){
+        var output = line.split(" | ")[1].split(" ");
+        var easy_numbers = output.filter(digit => [2, 4, 3, 7].includes(digit.length));
+        result += easy_numbers.length;
+    }
+    return result;
+}
+
+function add_digits(digit1, digit2){
+    var s = new Set((digit1+digit2).split(""));
+    return [ ...s ].sort().join("");
+}
+
+function add_digits(digit1, digit2){
+    var s = new Set((digit1+digit2).split(""));
+    return [ ...s ].sort().join("");
+}
+
+function is_included(included, including){
+    for(letter of included.split("")){
+        if(!including.includes(letter)){
+            return false;
+        }
+    }
+    return true;
+}
+
+
+function sort(string){
+    return string.split("").sort().join("");
+}
+
+function remove(inputs, digit){
+    return inputs.filter(item => item != digit);
+}
+
+function find_digit(inputs, filter_function){
+    result = inputs.filter(item => filter_function(item))[0];
+    inputs = remove(inputs, result);
+    return [inputs, result];
+}
+
+function guess_mapping(input){
+    var inputs = input.split(" | ")[0].split(" ");
+    [inputs, one] = find_digit(inputs, digit => digit.length == 2);
+    [inputs, four] = find_digit(inputs, digit => digit.length == 4);
+    [inputs, seven] = find_digit(inputs, digit => digit.length == 3);
+    [inputs, eight] = find_digit(inputs, digit => digit.length == 7);
+    
+    var four_and_seven = add_digits(four, seven);
+    [inputs, nine] = find_digit(inputs, digit => is_included(four_and_seven, digit));
+    
+    [inputs, zero] = find_digit(inputs, digit => is_included(one, digit) && digit.length == 6);
+    [inputs, six] = find_digit(inputs, digit => digit.length == 6);
+    
+    [inputs, three] = find_digit(inputs, digit => digit.length == 5 && is_included(one, digit));
+    [inputs, two] = find_digit(inputs, digit => digit.length == 5 && !is_included(add_digits(digit, three), nine));
+    
+    var five = inputs[0];    
+    
+    var result = {};
+    result[sort(zero)] = 0;
+    result[sort(one)] = 1;
+    result[sort(two)] = 2;
+    result[sort(three)] = 3;
+    result[sort(four)] = 4;
+    result[sort(five)] = 5;
+    result[sort(six)] = 6;
+    result[sort(seven)] = 7;
+    result[sort(eight)] = 8;
+    result[sort(nine)] = 9;
+    return result;
+    
+}
+
+function solve_line(input){
+    var mapping = guess_mapping(input);
+    var outputs = input.split(" | ")[1].split(" ");
+    var result = "";
+    for(var output of outputs){
+        result += mapping[sort(output)];
+    }
+    return Number(result);
+    
+}
+
+function solve_puzzle(puzzle){
+    var result = 0;
+    for(var line of puzzle.split("\n")){
+        result += solve_line(line);
+    }
+    return result;
+}
+
+var example = `be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe
+edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec | fcgedb cgb dgebacf gc
+fgaebd cg bdaec gdafb agbcfd gdcbef bgcad gfac gcb cdgabef | cg cg fdcagb cbg
+fbegcd cbd adcefb dageb afcb bc aefdc ecdab fgdeca fcdbega | efabcd cedba gadfec cb
+aecbfdg fbg gf bafeg dbefa fcge gcbea fcaegb dgceab fcbdga | gecf egdcabf bgf bfgea
+fgeab ca afcebg bdacfeg cfaedg gcfdb baec bfadeg bafgc acf | gebdcfa ecba ca fadegcb
+dbcfg fgd bdegcaf fgec aegbdf ecdfab fbedc dacgb gdcebf gf | cefg dcbef fcge gbcadfe
+bdfegc cbegaf gecbf dfcage bdacg ed bedf ced adcbefg gebcd | ed bcgafe cdgba cbgef
+egadfb cdbfeg cegd fecab cgb gbdefca cg fgcdab egfdb bfceg | gbdfcae bgc cg cgb
+gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce`;
+
+assertObjectsEquals("Find 1, 4, 7 and 8 in output", 26, find_easy_numbers(example));
+
+sysout("Find 1, 4, 7 and 8 in puzzle : ", find_easy_numbers(puzzle), EOL);
+
+
+assertObjectsEquals("Add two digits", "abdef", add_digits("eafb", "dab"));
+assertObjectsEquals("Digit is not included in another", false, is_included("aeafb", "ced"));
+assertObjectsEquals("Digit included in another", true, is_included("aeafb", "cefabd"));
+assertObjectsEquals("Guess example mapping ", {"abcdeg": 0, "ab" : 1, "acdfg": 2, "abcdf": 3, "abef": 4, "bcdef": 5, "bcdefg": 6, "abd": 7, "abcdefg": 8, "abcdef": 9}, guess_mapping("acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf"));
+assertObjectsEquals("solve one example line  ", 5353, solve_line("acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf"));
+assertObjectsEquals("guess mapping buggy example line  ", {"abdefg":0,"fg":1,"abcdg":2,"bcdfg":3,"cefg":4,"bcdef":5,"abcdef":6,"dfg":7,"abcdefg":8,"bcdefg":9}, guess_mapping("dbcfg fgd bdegcaf fgec aegbdf ecdfab fbedc dacgb gdcebf gf | cefg dcbef fcge gbcadfe"));
+assertObjectsEquals("solve buggy example line  ", 4548, solve_line("dbcfg fgd bdegcaf fgec aegbdf ecdfab fbedc dacgb gdcebf gf | cefg dcbef fcge gbcadfe"));
+assertObjectsEquals("solve example line  ", 61229, solve_puzzle(example));
+
+sysout("Solve puzzle : ", solve_puzzle(puzzle), EOL);
+
+
+</script>
+
+</html>
