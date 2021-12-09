@@ -1,43 +1,49 @@
-package org.rt.advent.twentyone.day7;
+package org.rt.advent.twentyone.day8;
 
-import org.rt.advent.twentyone.day6.LanternFishBand;
+import org.rt.advent.twentyone.day7.CrabsBandInSubmarine;
 import org.rt.advent.twentyone.util.DayPuzzle;
 import org.rt.advent.twentyone.util.PuzzleFailedException;
 
-import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
-public class Day7 extends DayPuzzle {
+public class Day8 extends DayPuzzle {
     @Override
     public String puzzle1() throws PuzzleFailedException {
         try {
+            DigitDisplayCounter counter = new DigitDisplayCounter();
 
-            CrabsBandInSubmarine band = new CrabsBandInSubmarine();
-            band.addCrabs(getDayStringAsIntArray());
-
-            int minConsoTarget  = band.calcMinimalFuelCost();
-            return ""+band.calcFuelCost(minConsoTarget);
+            return ""+counter.countOccurrencesOfIdentifiableNumbers(getDayStream());
         } catch (Exception e) {
             throw new PuzzleFailedException("no result for puzzle 1",e);
         }
+    }
+    public Collection<String> filterEmptyValues(String[] values) {
+        return Arrays.asList(Arrays.stream(values).filter(Predicate.not(String::isEmpty)).toArray(String[]::new));
     }
 
     @Override
     public String puzzle2() throws PuzzleFailedException {
         try {
 
-            CrabsBandInSubmarine band = new CrabsBandInSubmarine();
-            band.addCrabs(getDayStringAsIntArray());
+            return ""+Files.lines(Path.of(getDayInput())).mapToLong(line -> {
+                DigitGuess guesser = new DigitGuess();
+                String[] parts = line.split("\\|");
+                guesser.guessSignals(parts[0].split(" "));
+                return (long)guesser.getSignalValue(filterEmptyValues(parts[1].split(" ")));
+            }).sum();
 
-            int minConsoTarget  = band.calcMinimalRealFuelCost();
-            return ""+band.calcRealFuelCost(minConsoTarget);
         } catch (Exception e) {
             throw new PuzzleFailedException("no result for puzzle 1",e);
         }
     }
 
     public static void main(String[] args) {
-        Day7 day = new Day7();
+        Day8 day = new Day8();
         runPuzzles(day);
     }
 }
