@@ -1,0 +1,190 @@
+<html>
+
+<style>
+.ok {
+    color:green;
+}
+.failed {
+    color:red;
+}
+</style>
+<script src="framework.js" ></script>
+<script src="input_9.js" ></script>
+<script>
+
+function to_array(height_map){
+    return height_map.split("\n").map(line => line.split("").map(Number));
+}
+
+function is_inside_map(x, y, height_map){
+    return !(x < 0 || y < 0 || y >= height_map.length || x >= height_map[0].length);
+}
+
+function get_number(x, y, height_map){
+    if (!is_inside_map(x, y, height_map)){
+        return null;
+    }
+    return height_map[y][x];
+}
+
+function find_neighbours(x, y, height_map){
+    return [
+        get_number(x, y-1, height_map),
+        get_number(x, y+1, height_map),
+        get_number(x-1, y, height_map),
+        get_number(x+1, y, height_map)
+    ].filter(value => value != null);
+}
+
+function is_low_point(x, y, height_map){
+    var neighbours = find_neighbours(x, y, height_map)
+    var point_height = get_number(x, y, height_map);
+    return neighbours.filter(neighbour => neighbour <= point_height).length == 0;
+}
+
+function get_low_points(height_map){
+    var result = [];
+    for(var y = 0; y < height_map.length; y++){
+        for(var x = 0; x < height_map[y].length; x++){
+            if (is_low_point(x, y, height_map)){
+                result.push([x,y]);
+            }
+        }
+    }
+    return result;
+}
+
+function sum_all_low_points(height_map){
+    var result = 0;
+    for(var coords of get_low_points(height_map)){
+        var [x, y] = coords;
+        result += get_number(x, y, height_map) + 1;
+    }
+    return result;
+
+}
+
+function toHTML(height_map){
+    var colors = [
+        'rgb(49,54,149)',
+        'rgb(69,117,180)',
+        'rgb(116,173,209)',
+        'rgb(171,217,233)',
+        'rgb(224,243,248)',
+        'rgb(254,224,144)',
+        'rgb(253,174,97)',
+        'rgb(244,109,67)',
+        'rgb(215,48,39)',
+        'rgb(165,0,38)'
+    ]
+    sysout(EOL, EOL);
+    for(var y = 0; y < height_map.length; y++){
+        for(var x = 0; x < height_map[y].length; x++){
+            color = colors[get_number(x, y, height_map)];
+            if (is_low_point(x, y, height_map)){
+                sysout("<b style='color: white; background-color:", color, "'>", get_number(x, y, height_map), "</b>");
+            }else{
+                sysout("<span style='background-color:", color, "'>", get_number(x, y, height_map), "</span>");
+            }
+        }
+        sysout(EOL);
+    }
+    sysout(EOL);
+
+}
+
+function toBassinHTML(height_map){
+    var bassins = find_all_bassins(height_map);
+    for (var bassin of bassins){
+        for(var coords of bassin){
+            var [x,y] = coords;
+            height_map[y][x] = "0";
+        }
+    }
+    toHTML(height_map);
+
+}
+
+function explore(x, y, height_map, accumulator){
+    if(!is_inside_map(x, y, height_map)){
+        return accumulator;
+    }
+    if(accumulator.some(a => a[0] == x && a[1] == y)){
+        return accumulator;    
+    }
+    if(get_number(x, y, height_map) == 9){
+        return accumulator;
+    }
+    accumulator.push([x, y]);
+    for(var coords of [[x, y-1], [x, y+1], [x+1, y], [x-1, y]]){
+        var [newx, newy] = coords;
+        accumulator = explore(newx, newy, height_map, accumulator);
+    }
+    return accumulator;
+}
+
+function find_bassin(x, y, height_map){
+    return explore(x,y, height_map, []);
+}
+
+function find_all_bassins(height_map){
+    var result = [];
+    for(var coords of get_low_points(height_map)){
+        var [x,y] = coords;
+        result.push(find_bassin(x, y, height_map));
+    }
+    return result;
+}
+
+function find_product_of_biggest_bassins(height_map){
+    var bassins = find_all_bassins(height_map);
+    var bassins_size = bassins.map(bassin => bassin.length).sort(function (a, b) {  return a - b;  }).reverse();
+    return bassins_size[0] * bassins_size[1] * bassins_size[2];
+}
+
+var example = `2199943210
+3987894921
+9856789892
+8767896789
+9899965678`;
+
+var example_array = to_array(example);
+
+assertObjectsEquals("Find neightbours in the middle", [1,8,3, 8], find_neighbours(1,1, example_array));
+assertObjectsEquals("Find neightbours on a side", [1, 9, 9], find_neighbours(9,2, example_array));
+assertObjectsEquals("Find neightbours at the bottom", [6, 8, 9], find_neighbours(2,4, example_array));
+
+assertObjectsEquals("Is low point - false", false, is_low_point(3,1, example_array));
+assertObjectsEquals("Is low point - true", true, is_low_point(2,2, example_array));
+
+assertObjectsEquals("Sum all low points of the example", 15, sum_all_low_points(example_array));
+
+assertObjectsEquals("BUG - Puzzle - Is low point - false", false, is_low_point(0,0, to_array(`998
+976`)));
+
+sysout("Sum of low points is : ", sum_all_low_points(to_array(puzzle)), EOL);
+
+
+toHTML(example_array);
+
+toHTML(to_array(puzzle));
+
+assertObjectsEquals("Find bassin", [[0,0], [0,1], [1,0]], find_bassin(0, 0, example_array));
+assertObjectsEquals("Find all bassins",  [
+    [[1,0],[0,0],[0,1]],
+    [[9,0],[9,1],[9,2],[8,1],[8,0],[7,0],[6,0],[6,1],[5,0]],
+    [[2,2],[2,1],[3,1],[3,2],[3,3],[4,3],[4,2],[4,1],[5,2],[2,3],[1,3],[1,2],[1,4],[0,3]],
+    [[6,4],[6,3],[7,3],[7,2],[7,4],[8,4],[8,3],[9,4],[5,4]]
+], find_all_bassins(example_array));
+
+assertObjectsEquals("Find product of biggest bassins", 1134, find_product_of_biggest_bassins(example_array));
+
+sysout("Product of biggest puzzle bassins : ", find_product_of_biggest_bassins(to_array(puzzle)));
+
+toBassinHTML(example_array);
+
+toBassinHTML(to_array(puzzle));
+
+</script>
+
+</html>
