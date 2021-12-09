@@ -23,7 +23,7 @@ public class PointInt {
         return new PointInt(getX()+direction.getDx(), getY()+direction.getDy());
     }
 
-    static class PointIntFactory {
+    public static class PointIntFactory {
         private PointIntFactory() {
             super();
         }

@@ -1,6 +1,9 @@
 package org.rt.advent.twentyone.day5;
 
-enum Direction {
+import java.util.EnumSet;
+import java.util.List;
+
+public enum Direction {
     NORTH(0, -1),
     EST(1, 0),
     SOUTH(0, 1),
@@ -19,6 +22,13 @@ enum Direction {
     static {
         for (Direction d : values())
             byDeltas[d.getDx() + 1][d.getDy() + 1] = d;
+    }
+
+    public static EnumSet<Direction> getHortogonal() {
+        EnumSet<Direction> result = EnumSet.noneOf(Direction.class);
+        Direction[] hortogonals = { Direction.NORTH,Direction.SOUTH, Direction.WEST, Direction.EST};
+        result.addAll(List.of(hortogonals));
+        return result;
     }
 
     static Direction getByDeltas(int dx, int dy) {
@@ -45,4 +55,17 @@ enum Direction {
         return dy;
     }
 
+    public Direction invert() {
+        switch (this) {
+            case EST:return WEST;
+            case WEST:return EST;
+            case NORTH:return SOUTH;
+            case SOUTH:return NORTH;
+            case NE:return SW;
+            case SW:return NE;
+            case NW:return SE;
+            case SE:return NW;
+        }
+        throw new IllegalArgumentException("should not go there");
+    }
 }
