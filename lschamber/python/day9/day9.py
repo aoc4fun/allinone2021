@@ -30,7 +30,7 @@ def neighbours(i, j, length, height):
 
 
 def find_low_points(heightmap):
-    lowPoints = []
+    low_points = []
     map_x = len(heightmap[0])
     map_y = len(heightmap)
     for y in range(map_y):
@@ -38,8 +38,8 @@ def find_low_points(heightmap):
             neighbours_heights = [heightmap[y2][x2] for x2, y2 in neighbours(x, y, map_x, map_y)]
             height = heightmap[y][x]
             if height < min(neighbours_heights):
-                lowPoints += [height]
-    return lowPoints
+                low_points += [height]
+    return low_points
 
 
 def risk_levels(low_points):
@@ -140,8 +140,8 @@ def solve2(data):
     print("Solve 2")
     basins = list(map(lambda point: find_basin(point, data), find_low_points_coord(data)))
     # draw_basins(basins, len(data[0]), len(data))
-    basinLength = list(map(lambda basin: len(basin), basins))
-    print(f"Result is {multiply_three_max_items(basinLength)}")
+    basin_length = list(map(lambda basin: len(basin), basins))
+    print(f"Result is {multiply_three_max_items(basin_length)}")
 
 
 def part1(data, test_data):
