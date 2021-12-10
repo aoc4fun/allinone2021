@@ -1,6 +1,3 @@
-import statistics
-import math
-
 # Files
 INPUT_FILE = "./input.txt"
 TEST_FILE = "./test.txt"
@@ -8,22 +5,22 @@ TEST_FILE = "./test.txt"
 
 # -------- INPUT PROCESSING ------------
 
-def parseLine(line):
-    splitLine = line.split("|")
+def parse_line(line):
+    split_line = line.split("|")
     return (
-        [signal for signal in splitLine[0].strip().split(" ")], [digit for digit in splitLine[1].strip().split(" ")])
+        [signal for signal in split_line[0].strip().split(" ")], [digit for digit in split_line[1].strip().split(" ")])
 
 
-# Read the text file to get a the list of (signalPatern, fourDigits) elements
+# Read the text file to get the list of (signalPattern, fourDigits) elements
 def read_file(path):
     with open(path, "r") as file:
-        return [parseLine(line) for line in file.readlines()]
+        return [parse_line(line) for line in file.readlines()]
 
 
 # -------- LOGIC & FUN  --------------
 
 # Discarded Idea: Each digit has 7 segment. The goal is to understand which letter represent which segment
-# We may represent digit like binaray, with value of 1 if the segment is on:
+# We may represent digit like binary, with value of 1 if the segment is on:
 # 0: 1110111
 # 1: 0010010
 # 2: 1011101
@@ -42,20 +39,18 @@ def read_file(path):
 # The idea is find how we can use "simple" number ( that have a unique number of 1 ) to compute letters.
 # For instance with 1 and 7, we can find the which letter is represented by binary 1000000
 # 1 xor 7 => 0010010 xor 1010010 => 1000000
-# Then "make a xor" on 1 and 7 letters : cf xor acf => a We got our first letter.
+# Then "make a xor" on 1 and 7 letters : cf xor acf => We got our first letter.
 # Once we found all the letters, we can use this map to parse "string" numbers to digits by doing & between letters
 
 
 # Expect list of number or None
-def countNumberOfDigitFound(digits):
+def count_number_of_digit_found(digits):
     return sum(map(lambda digit: digit is not None, digits))
 
 
-def computeDigits(line, onlySimple=True):
+def compute_digits(line, only_simple=True):
     # Treat all numbers in the line as element to compute letters values
     line = set(line[0]).union(set(line[1]))
-    # Init Map with values for letters
-    lettersValue = {chr(i): None for i in range(ord('a'), ord('h'))}
 
     digits = [None for _ in range(10)]
     digits[1] = set(next(x for x in line if len(x) == 2))
@@ -63,7 +58,7 @@ def computeDigits(line, onlySimple=True):
     digits[7] = set(next(x for x in line if len(x) == 3))
     digits[8] = set(next(x for x in line if len(x) == 7))
 
-    if onlySimple:
+    if only_simple:
         return digits
 
     # 3 Is the only digit having both segment of 1 and of size 5
@@ -99,76 +94,77 @@ def computeDigits(line, onlySimple=True):
 
     return digits
 
-def translateDigits(line, onlySimple=False):
-    digitSet = computeDigits(line, onlySimple)
-    return [translateDigit(digit, digitSet) for digit in line[1]]
 
-def translateDigit(digit, digitSet):
+def translate_digits(line, only_simple=False):
+    digit_set = compute_digits(line, only_simple)
+    return [translate_digit(digit, digit_set) for digit in line[1]]
+
+
+def translate_digit(digit, digit_set):
     digit = set(digit)
-    for index, currentDigit in enumerate(digitSet):
+    for index, currentDigit in enumerate(digit_set):
         if currentDigit is not None and len(currentDigit.symmetric_difference(digit)) == 0:
             return index
     return None
 
-def joinNumbers(digits):
+
+def join_numbers(digits):
     return int("".join([str(s) for s in digits]))
+
 
 # -------- TEST ------------
 # Check that expected and actual values are equals. Display error and return false if not.
-def assertEquals(testName, expected, actual):
+def assert_equals(test_name, expected, actual):
     if expected == actual:
-        print(f"\tSuccess - {testName} \t|\t Result is '{actual}'")
+        print(f"\tSuccess - {test_name} \t|\t Result is '{actual}'")
         return True
     else:
-        print(f"\tFailure - {testName} \t|\t Expected '{expected}' but got '{actual}'")
+        print(f"\tFailure - {test_name} \t|\t Expected '{expected}' but got '{actual}'")
         return False
 
 
 def test1(data):
     print("Test 1")
-    digitParsed = [translateDigits(line, True) for line in data]
-    res = sum([countNumberOfDigitFound(d) for d in digitParsed])
-    assertEquals("Number of digit found", 26, res)
+    digit_parsed = [translate_digits(line, True) for line in data]
+    res = sum([count_number_of_digit_found(d) for d in digit_parsed])
+    assert_equals("Number of digit found", 26, res)
 
 
 def test2(data):
     print("Test 2")
-    testLine = parseLine("acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf")
-    #TODO Test each reading
-    numbersParsed = [joinNumbers(translateDigits(line, False)) for line in data]
-    assertEquals("Sum of numbers",61229, sum(numbersParsed))
-
-
+    test_line = parse_line("acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab | cdfeb fcadb cdfeb cdbaf")
+    # TODO Test each reading
+    numbers_parsed = [join_numbers(translate_digits(line, False)) for line in data]
+    assert_equals("Sum of numbers", 61229, sum(numbers_parsed))
 
 
 # ---- CHALLENGE SOLVER FUNCTION -------
 
 def solve1(data):
     print("Solve 1")
-    digitParsed = [translateDigits(line, True) for line in data]
-    res = sum([countNumberOfDigitFound(d) for d in digitParsed])
+    digit_parsed = [translate_digits(line, True) for line in data]
+    res = sum([count_number_of_digit_found(d) for d in digit_parsed])
     print(f"Number of digit found {res}")
 
 
 def solve2(data):
     print("Solve 2")
-    digitParsed = [translateDigits(line, True) for line in data]
-    numbersParsed = [joinNumbers(translateDigits(line, False)) for line in data]
-    print(f"Sum of numbers:  {sum(numbersParsed)}")
+    numbers_parsed = [join_numbers(translate_digits(line, False)) for line in data]
+    print(f"Sum of numbers:  {sum(numbers_parsed)}")
 
 
-def part1(data, testData):
-    test1(testData)
+def part1(data, test_data):
+    test1(test_data)
     solve1(data)
 
 
-def part2(data, testData):
-    test2(testData)
+def part2(data, test_data):
+    test2(test_data)
     solve2(data)
 
 
 if __name__ == '__main__':
-    testData = read_file(TEST_FILE)
-    data = read_file(INPUT_FILE)
-    part1(data, testData)
-    part2(data, testData)
+    test_file_data = read_file(TEST_FILE)
+    file_data = read_file(INPUT_FILE)
+    part1(file_data, test_file_data)
+    part2(file_data, test_file_data)
