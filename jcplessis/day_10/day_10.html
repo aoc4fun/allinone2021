@@ -1,0 +1,133 @@
+<html>
+
+<style>
+.ok {
+    color:green;
+}
+.failed {
+    color:red;
+}
+</style>
+<script src="framework.js" ></script>
+<script src="input_10.js" ></script>
+<script>
+
+function is_opening(character){
+    return ["(", "<", "[", "{"].includes(character);
+}
+
+function is_opposite(opening, character){
+    return get_closing_character(opening) == character;
+}
+
+function find_error(line){
+    var stack = [];
+    for(var character of line.split("")){
+        if (is_opening(character)){
+            stack.push(character);
+        }else{
+            var opening = stack.pop();
+            if(! is_opposite(opening, character)){
+                return character;
+            }
+        }
+    }
+    return null;
+}
+
+function find_all_errors(code){
+    var errors = [];
+    for(var line of code.split("\n")){
+        errors.push(find_error(line));
+    }
+    return errors.filter(error => error !== null);
+}
+
+function find_error_score(code){
+    var points = {
+        ")" : 3,
+        "]" : 57,
+        "}" : 1197,
+        ">" : 25137    
+    };
+    return find_all_errors(code).map(character => points[character]).reduce((partial_sum, a) => partial_sum + a, 0);
+}
+
+example = `[({(<(())[]>[[{[]{<()<>>
+[(()[<>])]({[<{<<[]>>(
+{([(<{}[<>[]}>{[]{[(<()>
+(((({<>}<{<{<>}{[]{[]{}
+[[<[([]))<([[{}[[()]]]
+[{[{({}]{}}([{[{{{}}([]
+{<[[]]>}<{[{[{[]{()[[[]
+[<(<(<(<{}))><([]([]()
+<{([([[(<>()){}]>(<<{{
+<{([{{}}[<[[[<>{}]]]>[]]`;
+
+assertObjectsEquals("Find error - no error", null, find_error("[<>({}){}[([])<>]]"));
+assertObjectsEquals("Find error - error", "}", find_error("{([(<{}[<>[]}>{[]{[(<()>"));
+
+assertObjectsEquals("Find example errors", ["}", ")", "]", ")", ">"], find_all_errors(example));
+assertObjectsEquals("Find example errors score", 26397, find_error_score(example));
+
+sysout("Puzzle score : ", find_error_score(puzzle), EOL);
+
+function get_closing_character(opening){
+    return {"(" : ")", 
+        "<" : ">", 
+        "[" : "]", 
+        "{":"}"}[opening];
+}
+
+function find_completion(line){
+    var stack = [];
+    for(var character of line.split("")){
+        if (is_opening(character)){
+            stack.push(character);
+        }else{
+            var opening = stack.pop();
+        }
+    }
+    return stack.reverse().map(character => get_closing_character(character)).join("");
+}
+
+function compute_completion_score(completion){
+    var result = 0;
+    var points = {
+        ")" : 1,
+        "]" : 2,
+        "}" : 3,
+        ">" : 4    
+    };
+    for(var character of completion.split("")){
+        result = result * 5 + points[character]
+    }
+    return result;
+}
+
+function median(numbers) {
+    const sorted = numbers.slice().sort((a, b) => a - b);
+    const middle = Math.floor(sorted.length / 2);
+
+    return sorted[middle];
+}
+
+function compute_code_completion_score(code){
+    var scores = [];
+    for(var line of code.split("\n")){
+        if(find_error(line) == null){
+            scores.push(compute_completion_score(find_completion(line)));
+        }
+    }
+    return median(scores);  
+}
+
+assertObjectsEquals("Find completion", "}}]])})]", find_completion("[({(<(())[]>[[{[]{<()<>>"));
+assertObjectsEquals("Compute completion score", 288957, compute_completion_score("}}]])})]"));
+
+assertObjectsEquals("Compute example completion middle score", 288957, compute_code_completion_score(example));
+
+sysout("Completion competition score : ", compute_code_completion_score(puzzle), EOL);
+</script>
+
+</html>
