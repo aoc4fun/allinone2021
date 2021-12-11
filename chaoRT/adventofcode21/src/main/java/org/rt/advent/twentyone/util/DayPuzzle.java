@@ -1,5 +1,7 @@
 package org.rt.advent.twentyone.util;
 
+import org.rt.advent.twentyone.day2.MoveInstructionFactory;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,6 +10,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -18,6 +21,19 @@ public abstract class DayPuzzle {
         InputStream is = classloader.getResourceAsStream(getClass().getSimpleName().toLowerCase()+".txt");
         return new BufferedReader(new InputStreamReader(is));
     }
+
+    public String[] getDayStreamAllLines() throws IOException {
+        ArrayList<String> result = new ArrayList<>();
+        BufferedReader reader = getDayStream();
+        String line = reader.readLine();
+        while (line != null) {
+            result.add(line);
+            line = reader.readLine();
+        }
+
+        return result.toArray(new String[0]);
+    }
+
     public int[] getDayStringAsIntArray() throws IOException {
         return Arrays.stream(getDayStream().readLine().split(",")).mapToInt(Integer::parseInt).toArray();
     }
