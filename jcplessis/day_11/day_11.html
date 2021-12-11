@@ -1,0 +1,161 @@
+<html>
+
+<style>
+.ok {
+    color:green;
+}
+.failed {
+    color:red;
+}
+</style>
+<script src="framework.js" ></script>
+<script src="input_11.js" ></script>
+<script>
+
+function toString(octopuses_array){
+    return octopuses_array.map(line => line.join("")).join("\n");
+}
+
+function is_already_handled(x, y, already_handled){
+    return already_handled.some(coords => coords[0] == x && coords[1] == y);
+}
+
+function update_neighbours(x, y, octopuses_array){
+    for (const dx of [-1, 0, 1]) {
+        for (const dy of [-1, 0, 1]) {
+            var nx = x+dx;
+            var ny = y+dy;
+            if(nx >= 0 && nx < octopuses_array[y].length && ny >= 0 && ny < octopuses_array.length){
+                octopuses_array[ny][nx] += 1;
+            }
+        }
+    }
+}
+
+function handle_flash(octopuses_array, already_handled=[]){
+    var flashCount = 0;
+    for(var y = 0; y < octopuses_array.length; y++){
+        for (let x = 0; x < octopuses_array[y].length; x++) {
+            const element = octopuses_array[y][x];
+            if(element > 9 && !is_already_handled(x, y, already_handled)){
+                flashCount+= 1;
+                already_handled.push([x, y]);
+                update_neighbours(x, y, octopuses_array);
+            }
+        }
+    }
+    if(flashCount > 0){
+        return flashCount + handle_flash(octopuses_array, already_handled);
+    }
+    return 0;
+}
+function next_step(octopuses){
+    var octopuses_array = octopuses.split("\n").map(line => line.split("").map(value => Number(value)));
+    octopuses_array = octopuses_array.map(line => line.map(value => value + 1));
+    var nbFlash = handle_flash(octopuses_array);
+    octopuses_array = octopuses_array.map(line => line.map(value => value > 9 ? 0 : value));
+    return [toString(octopuses_array), nbFlash];
+}
+
+function next_steps(octopuses, steps){
+    var totalFlashes = 0;
+    for (let i = 0; i < steps; i++) {
+        var [octopuses, nbFlash] = next_step(octopuses);  
+        totalFlashes += nbFlash;    
+    }
+    return [octopuses, totalFlashes];
+}
+
+assertObjectsEquals("Simple next step no flash", [`2345
+6789
+2345`, 0], next_step(`1234
+5678
+1234`));
+
+assertObjectsEquals("Simple flash", [`2221
+2021
+2221`, 1], next_step(`0000
+0900
+0000`));
+
+assertObjectsEquals("Simple flash along the border", [`1120
+1122
+1111`, 1], next_step(`0009
+0000
+0000`));
+
+assertObjectsEquals("Flash and re-flash", [`2332
+2002
+2332`, 2], next_step(`0000
+0890
+0000`));
+
+var example = `5483143223
+2745854711
+5264556173
+6141336146
+6357385478
+4167524645
+2176841721
+6882881134
+4846848554
+5283751526`;
+
+assertObjectsEquals("Example step 1", [`6594254334
+3856965822
+6375667284
+7252447257
+7468496589
+5278635756
+3287952832
+7993992245
+5957959665
+6394862637`, 0], next_step(example));
+
+assertObjectsEquals("Example step 10", [`0481112976
+0031112009
+0041112504
+0081111406
+0099111306
+0093511233
+0442361130
+5532252350
+0532250600
+0032240000`, 204], next_steps(example, 10));
+
+
+assertObjectsEquals("Example step 100", [`0397666866
+0749766918
+0053976933
+0004297822
+0004229892
+0053222877
+0532222966
+9322228966
+7922286866
+6789998766`, 1656], next_steps(example, 100));
+
+var [octopuses, nbFlash] = next_steps(puzzle, 100);
+sysout("After 100 steps of my puzzle, there were : ", nbFlash, " flashes", EOL);
+
+
+function find_sync(octopuses){
+    var i = 0;
+    while(true){
+        var [octopuses, nbFlash] = next_step(octopuses);
+        i++;
+        if(nbFlash == 100){
+            return i;
+        }
+        
+    }
+}
+
+
+assertObjectsEquals("Example sync step", 195, find_sync(example));
+
+sysout("My puzzle syncs after : ", find_sync(puzzle), " steps", EOL);
+
+</script>
+
+</html>
