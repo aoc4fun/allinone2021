@@ -33,7 +33,7 @@ class Day5Test {
                 "1111200000" +  System.lineSeparator() +
                 "0000100000" +  System.lineSeparator() +
                 "0000100000" +  System.lineSeparator();
-        assertEquals(expected, map.getMapAsString(10));
+        assertEquals(expected, map.getMapAsString(10, System.lineSeparator()));
 
         assertEquals(5, map.countPointWhereTwoPointsOverlaps());
     }

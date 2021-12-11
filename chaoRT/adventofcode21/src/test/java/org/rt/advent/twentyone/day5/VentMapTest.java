@@ -15,7 +15,7 @@ class VentMapTest {
         VentMap tested = VentMap.VentMapFactory.createEmpty();
         tested.drawLine(Line.LineBuilder.from(1,0).to(9,0));
 
-        BufferedReader read = new BufferedReader(new StringReader(tested.getMapAsString(10)));
+        BufferedReader read = new BufferedReader(new StringReader(tested.getMapAsString(10, System.lineSeparator())));
         assertEquals("0111111111", read.readLine());
 
 

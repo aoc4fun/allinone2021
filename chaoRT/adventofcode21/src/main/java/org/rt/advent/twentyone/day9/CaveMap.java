@@ -37,10 +37,14 @@ public class CaveMap {
     }
 
     public int getLevel(PointInt pos) {
-        if(pos.getX() < 0 || pos.getX() >= nbCol) return Integer.MAX_VALUE;
-        if(pos.getY() < 0 || pos.getY() >= nbRow) return Integer.MAX_VALUE;
-
+        if(isOutOfBound(pos)) return Integer.MAX_VALUE;
         return levels[pos.getY()][pos.getX()];
+    }
+
+    private boolean isOutOfBound(PointInt pos) {
+        if(pos.getX() < 0 || pos.getX() >= nbCol) return true;
+        if(pos.getY() < 0 || pos.getY() >= nbRow) return true;
+        return false;
     }
 
     public Collection<RiskLevel> getLocalMins() {

@@ -82,12 +82,12 @@ public class VentMap {
     }
 
 
-    public String getMapAsString(int range) {
+    public String getMapAsString(int range, String lineSep) {
         StringBuilder result = new StringBuilder();
         Arrays.stream(map).limit(range)
                 .forEach(line -> {
                     result.append(showLine(line, range));
-                    result.append(System.lineSeparator());
+                    result.append(lineSep);
                 });
         return result.toString();
     }
