@@ -1,4 +1,4 @@
-from itertools import permutations, product
+from itertools import product
 
 # Files
 INPUT_FILE = "./input.txt"
@@ -45,10 +45,12 @@ def octopuses_flash(octopuses_map):
     octopuses_map = [[elt if elt < 10 else 0 for elt in line] for line in octopuses_map]
     return octopuses_map, len(flashed_octopuses)
 
+
 def run_step(octopuses_map):
     octopuses_map = increment_map(octopuses_map)
     octopuses_map, nb_flash = octopuses_flash(octopuses_map)
     return octopuses_map, nb_flash
+
 
 def count_flashes(octopuses_map, n):
     nb_flash_tot = 0
@@ -121,6 +123,6 @@ def part2(data, test_data):
 
 if __name__ == '__main__':
     test_input = read_file(TEST_FILE)
-    chal_input = read_file(INPUT_FILE)
-    part1(chal_input, test_input)
-    part2(chal_input, test_input)
+    challenge_input = read_file(INPUT_FILE)
+    part1(challenge_input, test_input)
+    part2(challenge_input, test_input)
