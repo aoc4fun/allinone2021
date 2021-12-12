@@ -1,0 +1,126 @@
+<html>
+
+<style>
+.ok {
+    color:green;
+}
+.failed {
+    color:red;
+}
+</style>
+<script src="framework.js" ></script>
+<script src="input_12.js" ></script>
+<script>
+
+function add_link(caves, start, end){
+    if(start in caves){
+        caves[start].push(end);
+    }else{
+        caves[start] = [end];
+    }
+
+}
+
+function build_graph(caves_description){
+    var result  = {};
+    for(const line of caves_description.split("\n")){
+        const [start, end] = line.split("-");
+        add_link(result, start, end)
+        add_link(result, end, start)
+    }
+    return result;
+}
+
+function can_explore(state, already_explored){
+    return state == state.toUpperCase() || !already_explored.includes(state);
+}
+
+function explore(state, graph, already_explored, joker=0){
+    if(state == "end"){
+        return [["end"]];
+    }
+    var result = [];
+    for(var next of graph[state]){
+        if (can_explore(next, already_explored)){
+            next_paths = explore(next, graph, [state, ...already_explored], joker)
+            next_paths.forEach(path => {
+                result.push([state, ...path]);
+            });
+        }else{
+            if (joker > 0 && next != "start" && next == next.toLowerCase()){
+                next_paths = explore(next, graph, [state, ...already_explored], joker-1)
+                next_paths.forEach(path => {
+                    result.push([state, ...path]);
+                });
+            }
+        }
+    }
+    return result;
+}
+
+function generate_paths(caves_description, joker = 0){
+    var graph = build_graph(caves_description);
+    return explore("start", graph, [], joker).map(path => path.join(","));
+}
+
+function count_paths(caves_description, joker = 0){
+    return generate_paths(caves_description, joker).length;
+}
+
+assertObjectsEquals("Build super simple graph", {start:["A"], A:["start"]}, build_graph(`start-A`));
+assertObjectsEquals("Build graph with several destinations", {start:["A"], A:["start", "b"], b:["A"]}, build_graph(`start-A
+A-b`));
+
+assertObjectsEquals("Can explore uppercase ", true, can_explore("A", ["A"]));
+assertObjectsEquals("Can explore lowercase not explored ", true, can_explore("b", ["A"]));
+assertObjectsEquals("Cannot explore lowercase alreadw explored ", false, can_explore("b", ["A", "b"]));
+
+assertObjectsEquals("Generate all paths", ["start,A,b,A,end", "start,A,end"], generate_paths(`start-A
+A-b
+A-end`));
+
+assertObjectsEquals("Generate all example paths", ["start,A,c,A,b,A,end",
+"start,A,c,A,b,end",
+"start,A,c,A,end",
+"start,A,b,A,c,A,end",
+"start,A,b,A,end",
+"start,A,b,end",
+"start,A,end",
+"start,b,A,c,A,end",
+"start,b,A,end",
+"start,b,end"], generate_paths(`start-A
+start-b
+A-c
+A-b
+b-d
+A-end
+b-end`));
+
+
+assertObjectsEquals("Count example paths", 10, count_paths(`start-A
+start-b
+A-c
+A-b
+b-d
+A-end
+b-end`));
+
+sysout("There are ", count_paths(puzzle), " paths in my puzzle.", EOL);
+
+assertObjectsEquals("Generate all paths with one joker", ["start,A,b,A,b,A,end", "start,A,b,A,end", "start,A,end"], generate_paths(`start-A
+A-b
+A-end`, 1));
+
+assertObjectsEquals("Count all example paths with one joker", 36, count_paths(`start-A
+start-b
+A-c
+A-b
+b-d
+A-end
+b-end`, 1));
+
+sysout("In my puzzle, allowing for one joker, I there are ", count_paths(puzzle, 1), " paths.", EOL);
+
+</script>
+
+</html>
