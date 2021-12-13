@@ -1,0 +1,137 @@
+<html>
+
+<style>
+.ok {
+    color:green;
+}
+.failed {
+    color:red;
+}
+</style>
+<script src="framework.js" ></script>
+<script src="input_13.js" ></script>
+<script>
+function printHtml(points){
+    sysout("<tt>", toString(points).replaceAll("\n", EOL), "</tt>", EOL, EOL);
+}
+
+function get_map_dimensions(points){
+    var maxX = Math.max(...points.split("\n").map(point => Number(point.split(",")[0])));
+    var maxY = Math.max(...points.split("\n").map(point => Number(point.split(",")[1])));
+    return [maxX + 1, maxY + 1];
+}
+
+function toString(points){
+    var [dx, dy] = get_map_dimensions(points);
+    var allPoints = Array(dy).fill().map(()=>Array(dx).fill("."));
+    points.split("\n").forEach(point => {
+        var [x, y] = point.split(",").map(Number);
+        allPoints[y][x] = "#";
+    });
+    return allPoints.map(line => line.join("")).join("\n");
+
+}
+
+function fold_x(points, position){
+    var result = [];
+    for(var coords of points.split("\n")){
+        var [x, y] = coords.split(",").map(Number);
+        if(x > position){
+            x = position - (x - position);
+        }
+        result.push(x + "," + y);
+    }
+    return [...new Set(result)].join("\n");
+}
+
+function fold_y(points, position){
+    var result = [];
+    for(var coords of points.split("\n")){
+        var [x, y] = coords.split(",").map(Number);
+        if(y > position){
+            y = position - (y - position);
+        }
+        result.push(x + "," + y);
+    }
+    return [...new Set(result)].join("\n");
+}
+
+function make_folds(points, folds){
+    for(var fold of folds){
+        var [direction, position] = fold.split(" ")[2].split("=");
+        if(direction == "x") {
+            points = fold_x(points, Number(position));
+        }
+        if(direction == "y") {
+            points = fold_y(points, Number(position));
+        }
+    }
+    return points;
+}
+
+function find_dots_left(points, folds){
+    points = make_folds(points, folds);
+    return points.split("\n").length;
+}
+
+
+assertObjectsEquals("Simple X fold", `0,0
+1,0`,
+fold_x(`0,0
+3,0`, 2));
+
+assertObjectsEquals("X fold with overlap", `0,0`,
+fold_x(`0,0
+4,0`, 2));
+
+assertObjectsEquals("Points to String", `#...#`,
+toString(`0,0
+4,0`, 2));
+
+var example = `6,10
+0,14
+9,10
+0,3
+10,4
+4,11
+6,0
+6,12
+4,1
+0,13
+10,12
+3,4
+3,0
+8,4
+1,10
+2,14
+8,10
+9,0`;
+
+sysout(EOL, "<tt>", toString(example).replaceAll("\n", EOL), "</tt>");
+
+assertObjectsEquals("Fold example once", `#.##..#..#.
+#...#......
+......#...#
+#...#......
+.#.#..#.###`,
+toString(fold_y(example, 7)));
+
+assertObjectsEquals("Fold example twice", `#####
+#...#
+#...#
+#...#
+#####`,
+toString(fold_x(fold_y(example, 7), 5)));
+
+assertObjectsEquals("Find example dots left", 17, find_dots_left(example, ["fold along y=7"]));
+
+sysout("Folding my puzzle once generates ", find_dots_left(puzzle, ["fold along x=655"]), " distinct points", EOL);
+
+sysout("Folding all the way gives :", EOL);
+printHtml(make_folds(puzzle, folds.split("\n")));
+
+
+
+</script>
+
+</html>
