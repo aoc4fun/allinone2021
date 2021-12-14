@@ -1,0 +1,175 @@
+<html>
+
+<style>
+.ok {
+    color:green;
+}
+.failed {
+    color:red;
+}
+</style>
+<script src="framework.js" ></script>
+<script src="input_14.js" ></script>
+<script>
+
+
+function* string_generator(input){
+    for(var i = 0; i < input.length; i++){
+        yield input.charAt(i);
+    }
+}
+
+function to_map(rules){
+    var result = {};
+    rules.forEach(rule => {
+        var [source, destination] = rule.split(" -> ");
+        result[source] = destination;
+    });
+    return result;
+}
+
+var generator_done = 0;
+function* apply_rule_generator(input_generator, rules){
+    var rulesMap = to_map(rules);
+    var result = [];
+    var element1 = input_generator.next().value;
+    for(var element2 of input_generator){
+        var addedElement = rulesMap[element1+element2];
+        yield element1;
+        yield addedElement;
+        element1 = element2;
+    }
+    yield element1;
+    generator_done++;
+    console.log("Generator done", generator_done);
+}
+
+
+
+function apply_rule(input, rules){
+    output_generator = apply_rule_generator(string_generator(input), rules);
+    return [...output_generator].join("");
+}
+
+function iterate_rules(input, rules, nb_iteration){
+    generator_done = 0;
+    input_generator = string_generator(input);
+    for(var i = 0; i < nb_iteration; i++){
+        input_generator = apply_rule_generator(input_generator, rules);
+    }
+    return input_generator;
+}
+
+function to_string(generator){
+    return [...generator].join("")
+}
+
+function diff_max_min_elements(input_generator){
+    var counts = new Map();
+    for(var element of input_generator){
+        counts.set(element, (counts.get(element) || 0) + 1);
+    };
+    var max = Math.max(...counts.values());
+    var min = Math.min(...counts.values());
+    return max-min;
+}
+
+assertObjectsEquals("Apply simple rule", "ABA", apply_rule("AA", ["AA -> B"]));
+
+var exampleRules = `CH -> B
+HH -> N
+CB -> H
+NH -> C
+HB -> C
+HC -> B
+HN -> C
+NN -> C
+BH -> H
+NC -> B
+NB -> B
+BN -> B
+BB -> N
+BC -> B
+CC -> N
+CN -> C`.split("\n");
+
+assertObjectsEquals("Apply example rule - once", "NCNBCHB", apply_rule("NNCB", exampleRules));
+
+assertObjectsEquals("Apply example rule - 4 times", "NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB", to_string(iterate_rules("NNCB", exampleRules, 4)));
+
+assertObjectsEquals("Diff max and min elements", 1, diff_max_min_elements("NCNBCHB"));
+
+assertObjectsEquals("Diff example max and min elements", 1588, diff_max_min_elements(iterate_rules("NNCB", exampleRules, 10)));
+
+sysout("In my puzzle, there are ", diff_max_min_elements(iterate_rules(input, puzzle, 10)), " more of the max element thant the min element after 10 iterations", EOL);
+
+
+
+var cache = {}
+function compute_counts(input, rules, stages){
+    if(input+stages in cache){
+        return cache[input+stages];
+    }
+    if(stages == 0){
+        var result = {};
+        for(var letter of input.split("")){
+            result[letter] = (result[letter] || 0) + 1;
+        }
+        return result;
+    }else{
+        var rulesMap = to_map(rules);
+        var addedElement = rulesMap[input];
+        var leftPart = compute_counts(input[0] + addedElement, rules, stages - 1);
+        var rightPart = compute_counts(addedElement + input[1], rules, stages - 1);
+        var merged = {};
+        for(var key in leftPart){
+            merged[key] = (merged[key] || 0) + leftPart[key];
+        }
+        for(var key in rightPart){
+            merged[key] = (merged[key] || 0) + rightPart[key];
+        }
+        merged[addedElement] --;
+        cache[input+stages] = merged;
+        return merged;
+    }
+}
+
+function compute_all_counts(input, rules, stages){
+    var merged = {};
+    cache = {};
+    for(var i = 0; i < input.length -1; i++){
+        var subStep = compute_counts(input[i]+input[i+1], rules, stages);
+        for(var key in subStep){
+            merged[key] = (merged[key] || 0) + subStep[key];
+        }
+        if(i != input.length-2) merged[input[i+1]] --;
+    }
+    return merged;
+}
+
+function compute_diff_max_min_elements(element_map){
+    var counts = new Map();
+    for(var element in element_map){
+        counts.set(element, element_map[element]);
+    };
+    var max = Math.max(...counts.values());
+    var min = Math.min(...counts.values());
+    return max-min;
+}
+
+assertObjectsEquals("Generate counts at last stage", {"A" : 1, "B": 1}, compute_counts("AB", ["AB -> C"], 0));
+assertObjectsEquals("Generate counts at before last stage", {"A" : 1, "C": 1, "B" : 1}, compute_counts("AB", ["AB -> C"], 1));
+assertObjectsEquals("Generate counts at before before last stage", {"A" : 1, "D": 2, "C" : 1, "B" : 1}, compute_counts("AB", ["AB -> C", "AC -> D", "CB -> D" ], 2));
+
+assertObjectsEquals("Generate all counts at one stage", {"A" : 1, "C": 2, "B" : 1, "D" : 1}, compute_all_counts("ABC", ["AB -> C", "AC -> D", "CB -> D", "BC -> D"], 1));
+assertObjectsEquals("Generate example at step 10", {"N" : 865, "B" : 1749, "C": 298, "H" : 161}, compute_all_counts("NNCB", exampleRules, 10));
+
+assertObjectsEquals("Compute difference in example at step 10", 1588, compute_diff_max_min_elements(compute_all_counts("NNCB", exampleRules, 10)));
+
+assertObjectsEquals("Compute difference in example at step 40", 2188189693529, compute_diff_max_min_elements(compute_all_counts("NNCB", exampleRules, 40)));
+
+sysout("In my puzzle, there are ", compute_diff_max_min_elements(compute_all_counts(input, puzzle, 40)), " more of the max element thant the min element after 40 iterations", EOL);
+
+</script>
+
+</html>
