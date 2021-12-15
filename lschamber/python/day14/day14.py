@@ -4,10 +4,8 @@ import math
 INPUT_FILE = "./input.txt"
 TEST_FILE = "./test.txt"
 
+
 # -------- INPUT PROCESSING ------------
-
-FOLD_START = "fold along "
-
 
 # Read the text file
 def read_file(path):
@@ -121,4 +119,4 @@ if __name__ == '__main__':
     test_input = read_file(TEST_FILE)
     challenge_input = read_file(INPUT_FILE)
     part1(challenge_input, test_input)
-    #part2(challenge_input, test_input)
+    # part2(challenge_input, test_input)
