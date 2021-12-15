@@ -1,7 +1,7 @@
 package org.rt.advent.twentyone.day9;
 
 import org.junit.jupiter.api.Test;
-import org.rt.advent.twentyone.day5.PointInt;
+import org.rt.advent.twentyone.day5.PointIntFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,9 +27,9 @@ class CaveMapTest {
 
 
         CaveMap map = getSampleMap();
-        assertEquals(2, map.getLevel(PointInt.PointIntFactory.createFromCoords(0,0)));
-        assertEquals(1, map.getLevel(PointInt.PointIntFactory.createFromCoords(1,0)));
-        assertEquals(3, map.getLevel(PointInt.PointIntFactory.createFromCoords(0,1)));
+        assertEquals(2, map.getLevel(PointIntFactory.createFromCoords(0,0)));
+        assertEquals(1, map.getLevel(PointIntFactory.createFromCoords(1,0)));
+        assertEquals(3, map.getLevel(PointIntFactory.createFromCoords(0,1)));
         Collection<CaveMap.RiskLevel> levels  = map.getLocalMins();
         assertEquals(4, levels.size());
         assertEquals(15, levels.stream().mapToLong(CaveMap.RiskLevel::getRiskLevel).sum());

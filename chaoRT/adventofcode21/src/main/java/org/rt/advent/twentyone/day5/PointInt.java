@@ -2,11 +2,11 @@ package org.rt.advent.twentyone.day5;
 
 import java.util.Objects;
 
-public class PointInt {
+public class PointInt implements  Comparable<PointInt>{
     int x;
     int y;
 
-    private PointInt(int x, int y) {
+    public PointInt(int x, int y) {
         this.x = x;
         this.y = y;
     }
@@ -23,18 +23,12 @@ public class PointInt {
         return new PointInt(getX()+direction.getDx(), getY()+direction.getDy());
     }
 
-    public static class PointIntFactory {
-        private PointIntFactory() {
-            super();
-        }
-        public static PointInt createFromString(String def) {
-            String[] coords = def.split(",");
-            return new PointInt(Integer.parseInt(coords[0]), Integer.parseInt(coords[1]));
-        }
-        public static PointInt createFromCoords(int x, int y) {
+    @Override
+    public int compareTo(PointInt pointInt) {
+        int compareX=Integer.compare(this.getX(), pointInt.getX());
+        if(compareX!=0) return compareX;
 
-            return new PointInt(x, y);
-        }
+        return Integer.compare(this.getY(), pointInt.getY());
     }
 
     @Override

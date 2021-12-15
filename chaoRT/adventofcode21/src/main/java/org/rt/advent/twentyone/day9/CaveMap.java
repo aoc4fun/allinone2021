@@ -2,6 +2,7 @@ package org.rt.advent.twentyone.day9;
 
 import org.rt.advent.twentyone.day5.Direction;
 import org.rt.advent.twentyone.day5.PointInt;
+import org.rt.advent.twentyone.day5.PointIntFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -67,7 +68,7 @@ public class CaveMap {
     public Collection<RiskLevel> getLocalMinsInLine(int y) {
             return IntStream.range(0,nbCol)
                     .mapToObj(
-                            x -> new RiskLevel(PointInt.PointIntFactory.createFromCoords(x,y),this)
+                            x -> new RiskLevel(PointIntFactory.createFromCoords(x,y),this)
                     ).filter(RiskLevel::isLocalMin).collect(Collectors.toCollection(ArrayList::new));
     }
 

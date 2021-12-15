@@ -2,6 +2,7 @@ package org.rt.advent.twentyone.day11;
 
 import org.rt.advent.twentyone.day5.Direction;
 import org.rt.advent.twentyone.day5.PointInt;
+import org.rt.advent.twentyone.day5.PointIntFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -125,7 +126,7 @@ public class OctopusMap {
     }
     private Stream<EnergyLevel> getOctopusInRow(int y) {
         return IntStream.range(0, nbCol)
-                .mapToObj(x -> getEnergyLevelAt(PointInt.PointIntFactory.createFromCoords(x,y))
+                .mapToObj(x -> getEnergyLevelAt(PointIntFactory.createFromCoords(x,y))
                 );
     }
 

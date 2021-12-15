@@ -17,7 +17,7 @@ class CrabsBandInSubmarineTest {
 
         int minConsoTarget  = band.calcMinimalFuelCost();
         assertEquals(2, minConsoTarget);
-        assertEquals(34, band.calcFuelCost(2));
+        assertEquals(37, band.calcFuelCost(2));
 
     }
 

@@ -56,8 +56,8 @@ public class Line {
         }
         static Line createFromDef(String line) {
             String[] parts = line.split(" ");
-            PointInt source = PointInt.PointIntFactory.createFromString(parts[0]);
-            PointInt target = PointInt.PointIntFactory.createFromString(parts[2]);
+            PointInt source = PointIntFactory.createFromString(parts[0]);
+            PointInt target = PointIntFactory.createFromString(parts[2]);
             return new Line(source, target);
         }
     }
@@ -65,13 +65,13 @@ public class Line {
     static class LineBuilder {
         PointInt source;
         private LineBuilder(int x, int y) {
-            this.source=PointInt.PointIntFactory.createFromCoords(x,y);
+            this.source= PointIntFactory.createFromCoords(x,y);
         }
         public static LineBuilder from(int  x, int y) {
             return new LineBuilder(x,y);
         }
         public Line to(int x,int y) {
-            return new Line(this.source, PointInt.PointIntFactory.createFromCoords(x,y));
+            return new Line(this.source, PointIntFactory.createFromCoords(x,y));
         }
     }
 
