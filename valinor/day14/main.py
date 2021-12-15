@@ -64,11 +64,16 @@ def problem1(data):
 def problem2(data):
     return count(data,40)
 
+
+def test():
+    assert(problem1(test_data)==1588)
+    assert(problem2(test_data)==2188189693529)
+
+
 if __name__ == '__main__':
     data = [line.replace("\n","") for line in open("input.txt").readlines()]
-    print(problem1(test_data))
+    test()
     print(problem1(data))
-    print(problem2(test_data))
     print(problem2(data))
 
 
