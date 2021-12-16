@@ -1,0 +1,261 @@
+<html>
+
+<style>
+.ok {
+    color:green;
+}
+.failed {
+    color:red;
+}
+</style>
+<script src="framework.js" ></script>
+<script src="input_16.js" ></script>
+<script>
+
+
+const SUM = 0;
+const MUL = 1;
+const MIN = 2;
+const MAX = 3;
+const INT = 4;
+const GT = 5;
+const LT = 6;
+const EQ = 7;
+
+
+
+class BinaryReader{
+    constructor(bits){
+        this.bits = bits;
+    }
+    
+    has_bits(){
+        return this.bits.length > 0;
+    }
+    
+    read_bits(nb_bits){
+        if(! this.has_bits()){
+            throw "No more bits !!!";
+        }
+        if(this.bits.length < nb_bits){
+            throw "Not enough bits !!!";
+        }
+        var result = this.bits.substring(0, nb_bits);
+        this.bits = this.bits.substring(nb_bits);
+        return result;
+    }
+    
+    read_int(nb_bits){
+        return parseInt(this.read_bits(nb_bits), 2);
+    }
+}
+
+function to_binary(hex_string){
+    for(var [from, to] of [
+        ["0", "0000"],
+        ["1", "0001"],
+        ["2", "0010"],
+        ["3", "0011"],
+        ["4", "0100"],
+        ["5", "0101"],
+        ["6", "0110"],
+        ["7", "0111"],
+        ["8", "1000"],
+        ["9", "1001"],
+        ["A", "1010"],
+        ["B", "1011"],
+        ["C", "1100"],
+        ["D", "1101"],
+        ["E", "1110"],
+        ["F", "1111"]    
+    ]){
+        hex_string = hex_string.replaceAll(from, to);
+    }
+
+    return hex_string;
+}
+
+function read_int_value(reader, depth=0){
+    var continued = reader.read_bits(1);
+    var value = reader.read_bits(4);
+    
+   if(continued == "0"){
+        return value;
+   }else{
+    return value + read_int_value(reader, depth+1);
+   }
+}
+
+function parse_int(version, type_id, reader){
+    return {
+        version : version,
+        type_id : type_id,
+        int_value: parseInt(read_int_value(reader), 2)
+    }
+}
+
+function parse_operator(version, type_id, reader){
+    var length_type = reader.read_int(1);
+    var childs = [];
+    if(length_type == 0){
+        var childs_bits_length = reader.read_int(15);
+        var child_bits = reader.read_bits(childs_bits_length);
+        var child_reader = new BinaryReader(child_bits);
+        
+        while(child_reader.has_bits()){
+            childs.push(parse(child_reader));
+        }
+    }
+    if(length_type == 1){
+        var childs_count = reader.read_int(11);
+        for(var i = 0; i < childs_count; i++){
+            childs.push(parse(reader));
+        }
+    }
+    return {
+        version : version,
+        type_id : type_id,
+        length_type: length_type,
+        childs: childs
+    }
+   
+}
+
+
+
+function parse(reader){
+    var version = reader.read_int(3);
+    var type_id = reader.read_int(3);
+    if(type_id == 4) return parse_int(version, type_id, reader);
+    else return parse_operator(version, type_id, reader);
+    
+}
+
+
+function parse_string(bin_string){
+    var reader = new BinaryReader(bin_string);
+    return parse(reader);
+    
+}
+
+function sum_versions(hierarchy){
+    var result = hierarchy.version;
+    if("childs" in hierarchy){
+        hierarchy.childs.forEach(child => result += sum_versions(child));
+    }
+    return result;
+}
+
+function sum_hex_string_versions(hex_string){
+    return sum_versions(parse_string(to_binary(hex_string)))
+}
+
+assertObjectsEquals("Hex to binary", "110100101111111000101000", to_binary("D2FE28"));
+assertObjectsEquals("Hex to binary", "00111000000000000110111101000101001010010001001000000000", to_binary("38006F45291200"));
+assertObjectsEquals("Hex to binary", "000000000101001011100100", to_binary("0052E4"));
+
+assertObjectsEquals("Parse integer", {version : 6, type_id: 4, int_value : 2021 }, parse_string("110100101111111000101000"));
+assertObjectsEquals("Parse type 0 operator", {version : 1, type_id: 6, length_type: 0, childs:[{version:6, type_id:4, int_value: 10}, {version:2, type_id:4, int_value:20}] }, parse_string(to_binary("38006F45291200")));
+assertObjectsEquals("Parse type 1 operator", {version : 7, type_id: 3, length_type: 1, childs:[{version:2, type_id:4, int_value: 1}, {version:4, type_id:4, int_value:2}, {version:1, type_id:4, int_value:3}] }, parse_string(to_binary("EE00D40C823060")));
+
+assertObjectsEquals("Check version sum", 16, sum_hex_string_versions("8A004A801A8002F478"));
+assertObjectsEquals("Check version sum", 12, sum_hex_string_versions("620080001611562C8802118E34"));
+assertObjectsEquals("Check version sum", 23, sum_hex_string_versions("C0015000016115A2E0802F182340"));
+assertObjectsEquals("Check version sum", 31, sum_hex_string_versions("A0016C880162017C3686B18A3D4780"));
+
+
+sysout("In my puzzle, the sum of versions is : ", sum_hex_string_versions(puzzle), EOL);
+
+
+function interpret_tree(tree){
+    if(tree.type_id == SUM){
+        var result = 0;
+        for(var child of tree.childs){
+            result += interpret_tree(child);
+        }
+        return result;
+    }
+    
+    if(tree.type_id == INT){
+        return tree.int_value;
+    }
+    
+    if(tree.type_id == MUL){
+        var result = 1;
+        for(var child of tree.childs){
+            result *= interpret_tree(child);
+        }
+        return result;
+    }
+    
+    if(tree.type_id == MIN){
+        var result = Infinity;
+        for(var child of tree.childs){
+            var childValue = interpret_tree(child);
+            if(childValue < result){
+                result = childValue;
+            }
+        }
+        return result;
+    }
+    
+    if(tree.type_id == MAX){
+        var result = -Infinity;
+        for(var child of tree.childs){
+            var childValue = interpret_tree(child);
+            if(childValue > result){
+                result = childValue;
+            }
+        }
+        return result;
+    }
+    
+    if(tree.type_id == LT){
+        var child1Value = interpret_tree(tree.childs[0]);
+        var child2Value = interpret_tree(tree.childs[1]);
+        if(child1Value < child2Value){
+                return 1;
+        }
+        return 0;
+    }
+    
+    if(tree.type_id == GT){
+        var child1Value = interpret_tree(tree.childs[0]);
+        var child2Value = interpret_tree(tree.childs[1]);
+        if(child1Value > child2Value){
+                return 1;
+        }
+        return 0;
+    }
+    
+    if(tree.type_id == EQ){
+        var child1Value = interpret_tree(tree.childs[0]);
+        var child2Value = interpret_tree(tree.childs[1]);
+        if(child1Value == child2Value){
+                return 1;
+        }
+        return 0;
+    }
+    
+}
+
+function interpret_string(hex_string){
+    var tree = parse_string(to_binary(hex_string));
+    return interpret_tree(tree);
+}
+
+assertObjectsEquals("Interpret sum", 3, interpret_string("C200B40A82"));
+assertObjectsEquals("Interpret product", 54, interpret_string("04005AC33890"));
+assertObjectsEquals("Interpret min", 7, interpret_string("880086C3E88112"));
+assertObjectsEquals("Interpret max", 9, interpret_string("CE00C43D881120"));
+assertObjectsEquals("Interpret less than", 1, interpret_string("D8005AC2A8F0"));
+assertObjectsEquals("Interpret not greater than", 0, interpret_string("F600BC2D8F"));
+assertObjectsEquals("Interpret not equal to", 0, interpret_string("9C005AC2F8F0"));
+
+assertObjectsEquals("Interpret an expression", 1, interpret_string("9C0141080250320F1802104A08"));
+
+sysout("Interpreting my puzzle produces : ", interpret_string(puzzle), EOL);
+
+</script>
+
+</html>
