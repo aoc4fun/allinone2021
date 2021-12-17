@@ -1,0 +1,81 @@
+<html>
+
+<style>
+.ok {
+    color:green;
+}
+.failed {
+    color:red;
+}
+</style>
+<script src="framework.js" ></script>
+<script src="input_16.js" ></script>
+<script>
+
+
+
+/*
+    Part 1 is mostly thinking
+    
+    After applying y steps the y velocity falls to 0
+    Then it speeds up downward and after applying y more steps you get back to height 0 with a downward velocity = - (initial y + 1)
+    So at 2y+1 steps you are at height = - (initial y velocity + 1)
+    
+    The best to go super high is to have the max y velocity, but if initial y velocity >= the bottom of the trench, the (2y+1) step already overshoots too far under the trench.
+    
+    So the best I can do in my case (max trench depth == 189) is to start with initial velocity = 188.
+    After 188 steps I'm at my highest
+    After 188*2 steps I'm back at height = 0 with downward velocity of 189.
+    After 188*2+1 steps I'm down at height = -189
+    
+    Now the highest point I can reach is 188+187+186+185+....+2+1
+*/
+
+
+var sum = 0;
+for(var i = 0; i < 189; i ++){
+    sum += i;
+}
+
+sysout("The best highest I can go is ", sum, EOL);
+
+// x=48..70, y=-189..-148
+
+function works(x, y){
+    var px = 0;
+    var py = 0;
+    var vx = x;
+    var vy = y;
+    for(var step = 0; step <= 189*2+1; step ++){
+        px += vx;
+        py += vy;
+        if(vx > 0) vx --;
+        vy --;
+        if(48 <= px && px <= 70 && -189 <= py && py <= -148){
+            return true;
+        }
+        if(py < -189 || px > 70){
+            return false;
+        }
+    }
+    return false;
+}
+
+
+assertObjectsEquals("Working setting", true, works(49, -180));
+
+var workingCount = 0;
+for(var x = 0; x <= 70; x ++){
+    for(var y = -189; y <= 189; y++){
+       if(works(x, y)){
+        workingCount ++;
+       }
+    }
+}
+
+sysout("Working count : ", workingCount, EOL);
+
+
+</script>
+
+</html>
