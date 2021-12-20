@@ -1,0 +1,135 @@
+<html>
+
+<style>
+.ok {
+    color:green;
+}
+.failed {
+    color:red;
+}
+</style>
+<script src="framework.js" ></script>
+<script src="input_20.js" ></script>
+<script>
+
+function prepare_matrix(image, background){
+    var matrix = string_to_string_matrix(image);
+    matrix.forEach(line => {
+        line.unshift(background);
+        line.push(background);
+    });
+    matrix.unshift(Array(matrix[0].length).fill(background));
+    matrix.push(Array(matrix[0].length).fill(background));
+    return matrix;
+}
+
+function compute_value(matrix, x, y, background){
+    var binaryValue = "";
+    for(dy = -1; dy <= 1; dy++){
+        for(dx = -1; dx <= 1; dx++){
+            if (is_inside_matrix(x+dx, y+dy, matrix)){
+                binaryValue += matrix[y+dy][x+dx];
+            }else{
+                binaryValue += background;
+            }
+                
+        }
+    }
+    binaryValue = binaryValue.replaceAll(".", "0");
+    binaryValue = binaryValue.replaceAll("#", "1");
+    return parseInt(binaryValue, 2);
+}
+
+
+function enhance_image(image, algorithm, background){
+    var matrix = prepare_matrix(image, background);
+    var result = create_matrix(matrix[0].length, matrix.length);
+    for(var y = 0; y < matrix.length; y ++){
+        for(var x = 0; x < matrix[y].length; x++){
+            var value = compute_value(matrix, x, y, background);
+            result[y][x] = algorithm[value];
+        }
+    }
+    return matrix_to_string(result) ;
+
+}
+
+function count_lit_pixels(image){
+    return image.split("#").length - 1;
+}
+
+assertObjectsEquals("Prepare matrix", `.......
+.#..#..
+.#.....
+.##..#.
+...#...
+...###.
+.......`, matrix_to_string(prepare_matrix(`#..#.
+#....
+##..#
+..#..
+..###`, '.')));
+
+assertObjectsEquals("Compute binary value", 34, compute_value(prepare_matrix(`#..#.
+#....
+##..#
+..#..
+..###`, '.'), 3, 3, '.'));
+
+assertObjectsEquals("Compute binary on the border", 1, compute_value(prepare_matrix(`#..#.
+#....
+##..#
+..#..
+..###`, '.'), 0,0, '.'));
+
+var example = `#..#.
+#....
+##..#
+..#..
+..###`;
+
+var example_algorithm = `..#.#..#####.#.#.#.###.##.....###.##.#..###.####..#####..#....#..#..##..###..######.###...####..#..#####..##..#.#####...##.#.#..#.##..#.#......#.###.######.###.####...#.##.##..#..#..#####.....#.#....###..#.##......#.....#..#..#..##..#...##.######.####.####.#.#...#.......#..#.#.#...####.##.#......#..#...##.#.##..#...##.#.##..###.#......#.#.......#.#.#.####.###.##...#.....####.#..#..#.##.#....##..#.####....##...##..#...#......#.#.......#.......##..####..#...#.#.#...##..#.#..###..#####........#..####......#..#`;
+
+assertObjectsEquals("Enhance example image", `.##.##.
+#..#.#.
+##.#..#
+####..#
+.#..##.
+..##..#
+...#.#.`, enhance_image(`#..#.
+#....
+##..#
+..#..
+..###`, example_algorithm, '.'));
+
+
+assertObjectsEquals("Enhance example image", 35, count_lit_pixels(`...............
+...............
+...............
+..........#....
+....#..#.#.....
+...#.#...###...
+...#...##.#....
+...#.....#.#...
+....#.#####....
+.....#.#####...
+......##.##....
+.......###.....
+...............
+...............
+...............`));
+
+var first_iteration = enhance_image(puzzle, enhancement, '.');
+var second_iteration = enhance_image(first_iteration, enhancement, '#');
+sysout("After 2 iterations, my image contains ", count_lit_pixels(second_iteration), EOL);
+
+var image = puzzle;
+for(var i = 0; i < 50; i++){
+    var background = i % 2 == 0 ? '.' : '#';
+    image = enhance_image(image, enhancement, background);
+}
+sysout("After 50 iterations, my image contains ", count_lit_pixels(image), EOL);
+
+</script>
+
+</html>
